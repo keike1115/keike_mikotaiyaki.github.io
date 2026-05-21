@@ -1,3 +1,19 @@
+/*
+ここではアイテムに関する共通処理をまとめています。やはり脱出ゲーム謎解きにアイテムは欠かせません。
+壱　アイテムを入手したときの派手な通知UI
+弐　内部処理　inventoryごとの個数と名前、ファイルパスを設定します。この値たちはアイテム設定の三種の神器です
+参　おなじく内部処理として個数操作(減少、消去)も栞にします。
+四　上記を使うために引数をもとに該当するinventoryNoを探索する栞は欠かせません。
+状況に応じて空箱や同名アイテムが格納されたinventoryNoをもってきてくれます
+伍　これらをinventoryボタンとして作画、反映します。このボタンによってプレイヤーは「手持ちのアイテム」を選択できるわけです。
+
+
+追記　現在は弐と伍の処理が混同していますね。内部処理とUIを切り分けるほうがいいかもということで、現在修正中です。
+具体的にはそれぞれの反映処理を新たな栞にくくりだすとか・・・
+「栞　アイテムインベントリUI状態更新」がそれになりますね。書きかけです。
+*/
+
+
 栞　デバッグMaine
 {
     
@@ -643,184 +659,6 @@
 }
 
 待機 続行禁止
-//---------------------------------------------------------------
-//こよボックス関連(アイテム合成ギミック)
-//---------------------------------------------------------------
-//こよボックスボタンの始めの入力先はここ
-//スクリプト　game_item.txt　こよボックスmain
-栞　こよボックスmain
-{
-   //入力禁止　 true
-     画面領域開始　sc_koyobox　原点回帰時解除
-    アウト　fukidasi_target　50 全画面領域
-    スクリプト /Plugins/lvui/_system/menu.txt
-    絵0 black_top black_full_1280.png 0 -650 75 カメラ付着
-    絵0 black_bot black_full_1280.png 0 650 75 カメラ付着
-    透明度　 black_.* 150 200
-    
-    背景 　ui_koyobox  UI/ui_koyobox.png  0 0 70
-    
-    タッチ素材設定　 UI/ui_Btn_miko01.png 　UI/ui_Btn_miko01.png　 UI/ui_Btn_miko01.png　se_maoudamashii_system13.ogg
-    ボタン0　koyobox_BtnA  300 330 80　透明無視　スクリプト　/Plugins/lvui/_system/events.txt 　func_会話skip処理
-   ボタン文字 koyobox_BtnA r-mplus-1c-m.ttf  70  0  50 "探索に戻る"
-   拡大　koyobox_Btn.*　60%
-    .文字色  koyobox_Btn* #FFFFFF
-     文字陰   koyobox_Btn.* 1  10   #fe4b74 0 0
-     .イン　koyobox_Btn.*　300
-    
-    スクリプト　game_scenario_miko{{now_stage数字}}.txt　こよ条件式
-    
-    
-   
-    待機　続行禁止
-    .アウト .*　100
-     待機　100
-   画面領域終了　sc_koyobox
-   入力禁止　 false
-     スクリプト終了
-}
-
-/*
-//こよ条件式はそれぞれのscenarioスクリプトでつかう
-//
-//例　
-栞　こよ条件式
-{
-   
-   //「素材をひとつも持っていなかった時」の条件式をつくる
-   変数　こよflagA = 0
-   変数　必要素材数 = 4
-   もし ( inventorypass[1] != "Mtetu") 　変数　こよflagA += 1
-   もし ( inventorypass[2] != "Mtetu") 　変数　こよflagA += 1
-   もし ( inventorypass[3] != "Mtetu") 　変数　こよflagA += 1
-   もし ( inventorypass[4] != "Mtetu") 　変数　こよflagA += 1
-   
-   //全部持っていなかったら0になるはず　
-   もし (こよflagA == 0)  スクリプト　game_scenario_miko{{now_stage数字}}.txt　こよ分岐_該当なし
-    もし (こよflagA == 0)　 スクリプト終了
-    
-    //一つでももっていたら残り素材を教えてあげよう
-    スクリプト　game_item.txt  こよアイテム入力　0　"Mtetu"　-20 -30  "40%"
-    スクリプト　game_item.txt  こよアイテム入力　1　"Mtetu"　100 -30 "40%"
-    スクリプト　game_item.txt  こよアイテム入力　2　"Mtetu"　-20 100 "40%"
-    スクリプト　game_item.txt  こよアイテム入力　3　"Mtetu"　100 100 "40%"
-    スクリプト　game_item.txt  こよアイテム入力　4　"hasami"　40 200 "30%"
-    
-    
-    //スクリプト　game_item.txt  こよアイテム出力　"出力アイテムpass"　(こよflagA)　(必要素材数)
-    スクリプト　game_item.txt  こよアイテム出力　"hasami"　(こよflagA)　(必要素材数)
-    
-    スクリプト終了
-}
-待機　続行禁止
-*/
-
-栞　こよ分岐_該当なし
-{
-    
-    .文字0　koyobox_mojiA 270 280 151  r-mplus-1c-m.ttf 40 "現在の手持ちで合成できる"
-    .文字0　koyobox_mojiB 270 340 151  r-mplus-1c-m.ttf 40 "アイテムはありません"
-    .文字陰   koyobox_moji.*  1  5  #fe4b74 0 0
-    親子　ui_koyobox　koyobox_moji.*
-    .イン　koyobox_moji.*　100
-    
-   入力禁止　 false
-    スクリプト終了
-    
-}
-
-
-栞　こよアイテム入力　_koyoNo　_koyopass　_koyoX　_koyoY　_koyoL
-{
-    
-    背景 　ui_koyobox  UI/ui_koyobox.png  0 0 70
-    絵0　koyoitem{{_koyoNo}}　item/item_{{_koyopass}}.png (_koyoX) (_koyoY) 71
-    変数　こよ手持ち　= inventorypass[{{_koyoNo}}]
-    //もし　( inventorypass[{{_koyoNo}}]  != {{_koyopass}}) 　絵0　koyoitem{{_koyoNo}}_false　UI/ui_koyoA.png (_koyoX) (_koyoY)  72
-    もし　( こよ手持ち  != _koyopass ) 　絵0　koyoitem{{_koyoNo}}_false　UI/ui_koyoA.png (_koyoX) (_koyoY)  72
-    
-    
-    
-    //文字　koyobox_mojiE 270 340 151  r-mplus-1c-m.ttf 40 "( {{こよ手持ち}} != {{_koyopass}}) "
-    //文字　koyobox_mojiC 270 440 151  r-mplus-1c-m.ttf 40 "{{_koyoNo}}{{_koyopass}}"
-    拡大　koyoitem{{_koyoNo}}　{{_koyoL}}
-    拡大　koyoitem{{_koyoNo}}_false　25%
-    .イン　koyoitem{{_koyoNo}} 50
-    透明度　koyoitem{{_koyoNo}}_false　150 50
-      変数　こよ手持ち = "Nohand"
-      //もし　(_koyoNo == 3 ) 待機
-    //.文字0　koyobox_mojiA 270 280 151  r-mplus-1c-m.ttf 40 "鉄ブロック×3 =鉄橋"
-    //.文字陰   koyobox_moji.*  1  5  #fe4b74 0 0
-    //親子　ui_koyobox　koyobox_moji.*
-    //.イン　koyobox_moji.*　100
-    スクリプト終了
-    
-}
-待機　続行禁止
-
-
-栞　こよアイテム出力　_koyopass　達成素材数　必要素材数
-{
-   
-     .文字0　 koyoitem_outmojiA 430 280 71  r-mplus-1c-m.ttf 100 "⇒"
-    .文字0　 koyoitem_outmojiB 380 350 71  r-mplus-1c-m.ttf 30 "合成可能"
-    .もし　(達成素材数 < 必要素材数)  文字0 koyoitem_outmojiB 380 350 71  r-mplus-1c-m.ttf 30 "合成不可"
-   //拡大　koyoitem_outmoji.*　50%
-    .文字陰   koyoitem_outmoji.*  1  5  #fe4b74 0 0
-   イン　koyoitem_outmoji.*　100
-   待機　100
-    .もし　(達成素材数 < 必要素材数)  スクリプト終了
-    
-    タッチ素材設定　item/item_{{_koyopass}}.png　item/item_{{_koyopass}}.png　item/item_{{_koyopass}}.png　se_maoudamashii_system13.ogg
-    ボタン0　koyoitem_out 450 50 71 透明無視　スクリプト　game_item.txt　こよアイテムゲットA  (_koyopass)
-    ボタン文字　koyoitem_out r-mplus-1c-m.ttf  70  0  200 "クリックで入手"
-    焦点　koyoitem_out　0.5 0.5
-   拡大　koyoitem_out　40%
-    .文字色  koyoitem_out* #FFFFFF
-     文字陰   koyoitem_out.* 1  10   #fe4b74 0 0
-     .イン　koyoitem_out.*　300
-    
-    //.文字陰   koyobox_moji.*  1  5  #fe4b74 0 0
-    //親子　ui_koyobox　koyobox_moji.*
-    //.イン　koyobox_moji.*　100
-    スクリプト終了
-    
-}
-
-待機　続行禁止
-
-栞　こよアイテムゲットA  _koyopass
-{
-    
-    
-    .アウト .*　100
-     待機　100
-   画面領域終了　sc_koyobox
-   入力禁止　true
-   //↓各スクリプトにで素材消去と合成素材入手処理を書く
-   スクリプト　game_scenario_miko{{now_stage数字}}.txt　こよアイテム入手と素材削除
-   入力禁止　 false
-   スクリプト終了原点回帰
-    
-    
-}
-待機　続行禁止
-/*
-//例
-栞　こよアイテム入手と素材削除
-{
-    //inventory削除
-    スクリプト　game_item.txt　アイテム消去　_inventoryNo
-    スクリプト　game_item.txt　アイテム消去　_inventoryNo
-    スクリプト　game_item.txt　アイテム消去　_inventoryNo
-    //合成item入手
-   スクリプト　game_item.txt　get_item_msg  0 "hasami"　"はさみ"
-    
-    スクリプト終了
-}
-待機　続行禁止
-*/
-    
     
 
 
