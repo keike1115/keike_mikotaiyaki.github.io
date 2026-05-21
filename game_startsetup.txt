@@ -1,0 +1,692 @@
+栞　デバッグMaine
+{
+    
+//------------------------------------------------------
+//デバッグ用変数←最後には全て消すこと
+//------------------------------------------------------
+//ゲームモード設定
+臨時全域変数 gamemode  = "miko"
+//臨時全域変数 gamemode  = "suba"
+//今の仮のステージ
+変数　D_now_stageNo  = 0 
+//------------------------------------------------------
+
+ジャンプ　game_startsetup.txt　start_game　{{D_now_stageNo}}
+
+
+}
+スクリプト終了
+待機　続行禁止
+
+    //セットで使用して可変するーーーーーーーーーーーー
+    //臨時全域変数　vn_R値_みこふぶ吹き出し　= 120
+    //M_宣言文字窓miko吹き出し
+    //ーーーーーーーーーーーーーーーーーーーーーーーー
+~スクリプト /Plugins/lvui/_system/macros.txt
+.スクリプト　game_startsetup.txt　func_共通レイヤー設定
+    絵0 fukidasi UI/ui_fukidasi_{{ gamemode}}.png 950 130 81
+    絵0 selected_img item/itemui_selected_{{ gamemode}}.png 820 -149 82
+    拡大　selected_img,  fukidasi 　25%
+    .イン　 fukidasi 10
+    イン　selected_img
+    
+    背景 back_inventory Back/back_inventory.png 0 0 80
+//------------------------------------------------------
+栞　nextscenario　_plus
+{
+    
+    入力禁止 true
+    待機　10
+    もし　(_plus == 1) 臨時全域変数　ヒント_死因　= "VOID"
+    スクリプト　game_startsetup.txt　func_共通レイヤー設定
+    .スクリプト　/Plugins/lvui/_system/events.txt 　func_scene切替開始_ToStage　(now_stageNo + {{ _plus}} )
+     .待機　1000
+   .最終ジャンプ　 game_startsetup.txt  start_game  (now_stageNo + {{ _plus}} )
+    
+    
+    
+    スクリプト終了
+    
+}
+
+
+待機 続行禁止
+スクリプト　/Plugins/lvui/_system/events.txt 　func_scene切替削除
+//---------------------------------------------------------------
+
+
+栞 　start_game　_stageNo
+{
+    
+    //各ステージのflag管理は「flag_temp」変数を使おう
+    変数消去2  .*temp.*
+    //変数消去2  .*flag*
+    
+    
+    文字自動待機 0
+    スクリプト　game_startsetup.txt　func_共通レイヤー設定
+    臨時全域変数 Obj背景Table_ = lvCreateVarHashMap()
+    臨時全域変数　now_stageNo  = _stageNo  
+    スクリプト　/Plugins/lvui/_system/events.txt 　func_ゼロ埋め　now_stageNo 2
+    .臨時全域変数　now_stage数字 = 返り値
+    変数消去　返り値
+    // システムエラ　"通過点その2"
+    // 演出中にボタン等が反応しないように
+    入力禁止 true
+    ~バックログリセット
+    文字進行通常強制 false  
+    //メニュー画面とマクロ登録
+    スクリプト /Plugins/lvui/_system/menu.txt
+    ~スクリプト /Plugins/lvui/_system/macros.txt
+    .スクリプト　game_item.txt　アイテム初期処理
+    
+    ジャンプ　game_scenario_{{gamemode }}{{now_stage数字}}.txt　gamescenario_{{gamemode }}_Maine
+  
+    
+    
+    
+    スクリプト終了
+}
+
+
+
+待機 続行禁止
+
+
+//---------------------------------------------------------------
+//　背景と左右場面転換ボタンを設置し親子で紐づけする。
+//
+栞　初期場面セット　backnamepass　NowObj　RightObj　LeftObj
+{
+    
+    //システムエラ　確認
+    //もし (Obj背景Table_{{NowObj}} == undefined) 全域変数 Obj背景Table_{{NowObj}} = lvCreateVarHashMap()
+
+    もし ( Obj背景Table_  == undefined ) 臨時全域変数 Obj背景Table_ = lvCreateVarHashMap()
+    もし ( Obj背景Table_["{{NowObj}}"] == undefined　)　臨時全域変数 Obj背景Table_["{{NowObj}}"] = lvCreateVarHashMap()
+    
+    
+    臨時全域変数 Obj背景Table_["{{NowObj}}"]["Right"] = "{{RightObj}}"
+    臨時全域変数 Obj背景Table_["{{NowObj}}"]["Left"] = "{{LeftObj}}"
+    臨時全域変数 Obj背景Table_["{{NowObj}}"]["Now"] = "{{NowObj}}"
+   // 変数　てすと　= Obj背景Table_{{NowObj}}["Right"] 
+    //システムメッセージ　"{{てすと}}"
+    
+    もし　(backnamepass != "VOID" ) 背景 back_{{NowObj}}  Back/{{backnamepass}}.png 0 0 0
+    違ったら　個体　back_{{NowObj}} 0 0 0
+    
+    
+    変数 _Now   = Obj背景Table_["{{NowObj}}"]["Now"]
+    変数 _Right = Obj背景Table_["{{NowObj}}"]["Right"]
+    変数 _Left  = Obj背景Table_["{{NowObj}}"]["Left"]
+    
+   タッチ素材設定  UI/ui_Btn_MIGI01.png　UI/ui_Btn_MIGI02.png　UI/ui_Btn_MIGI02.png se_maoudamashii_onepoint26.ogg se_maoudamashii_onepoint30.ogg
+    もし　(RightObj != "VOID") ボタン　ui_Btn_MIGI_{{NowObj}}_child　700 390 (vn_R値_場転ボタン)　透明無視　スクリプト game_startsetup.txt 背景移動 (_Now) (_Right) -1
+    タッチ素材設定   UI/ui_Btn_HIDARI01.png　UI/ui_Btn_HIDARI02.png　UI/ui_Btn_HIDARI02.png se_maoudamashii_onepoint26.ogg se_maoudamashii_onepoint30.ogg
+    もし　(LeftObj != "VOID") ボタン ui_Btn_HIDA_{{NowObj}}_child　-200 390 (vn_R値_場転ボタン)　透明無視　スクリプト game_startsetup.txt 背景移動 (_Now) (_Left) 1
+    拡大　ui_Btn_.*_{{NowObj}}_child　50%
+     
+     //親子宣言はこまめに毎回しよう
+     .親子　back_{{NowObj}}　.*{{NowObj}}_child
+     
+    .スクリプト終了
+}
+
+待機　続行禁止
+
+//------------------------
+//
+栞　背景移動　_NowObj　_NextObj　_muki
+{
+    
+    入力禁止　true
+    移動x　back_{{_NextObj}} (-1300*_muki)
+    待機　3
+    移動x　back_{{_NextObj}} 0 1000
+    移動x　back_{{_NowObj}} (1300*_muki)  1000
+    
+    //移動x　back_{{NextObj}} 0 1000
+    //移動x　back_{{NowObj}} (1300*muki)  1000
+   // .システムメッセージ　{{_NowObj}}{{ _NextObj }}
+    
+       待機　1000
+       .入力禁止　 false
+    スクリプト終了
+}
+
+待機　続行禁止
+//---------------------------------------------------------------
+
+//スクリプト　game_startsetup.txt　マジック帽子シャッフル
+栞　マジック帽子シャッフルX値演算
+{
+    
+    
+        //スクリプト　test.txt   てすとC
+    
+
+    変数　values　 =  lvCreateVarList(3, lvCreateVarList(2))
+    変数　values[0][0] = 1
+    変数　values[0][1] = 2
+    変数　values[1][0] = 0
+    変数　values[1][1] = 2
+    変数　values[2][0] = 0
+    変数　values[2][1] = 1
+
+
+    // AとBを選んだので、それぞれのX座標を交換する
+
+    変数 A = lvRandom(0, 2)
+    変数 B = values[A][0]
+    変数 C = values[A][1]
+
+
+    変数 　TempX = PosList[B]
+    臨時全域変数　　PosList[B] = PosList[C]
+    臨時全域変数　　PosList[C] = TempX
+
+    // 文字　end_miko_moji01 120 200 151  r-mplus-1c-m.ttf 40 "{{PosList[0]}}"
+     //文字　end_miko_moji02 120 250 151  r-mplus-1c-m.ttf 40 "{{PosList[1]}}"
+     //文字　end_miko_moji03 120 300 151  r-mplus-1c-m.ttf 40 "{{PosList[2]}}"
+    // オブジェクトを新しいX座標に移動する
+
+
+    スクリプト終了
+    
+}
+
+
+
+
+
+//----------------------------------------------------
+
+//
+//すてーじセレクト  300~
+
+//.スクリプト　game_startsetup.txt　func_共通レイヤー設定
+栞　func_共通レイヤー設定
+{
+    
+    
+    
+    ~スクリプト /Plugins/lvui/_system/macros.txt
+    
+    もし ( vn_C値_ヒント難易度No == undefined) 全域変数 vn_C値_ヒント難易度No　= 1
+    全域変数保存
+    
+    
+    
+    臨時全域変数　vn_R値_コンフ      　= 700//以上
+    臨時全域変数　vn_R値_シーン切替      　= 600//以上
+    臨時全域変数　vn_R値_ステセレクト　   = 500//以上
+    臨時全域変数　vn_R値_ヒント　  　　　　 = 500//以上
+    臨時全域変数　vn_R値_メニュ       　= 450//以上
+    臨時全域変数　vn_R値_ステ終了窓　   = 400//以上
+    臨時全域変数　vn_R値_アイテム窓    　= 380//以上
+    臨時全域変数　vn_R値_負けアニメ    　= 250//以上
+    //臨時全域変数　vn_R値_通常白窓吹き出し　= 都度可変 150以上250以下
+    //臨時全域変数　vn_R値_インベントリ文字    　= (vn_R値_インベントリ +20)//以上
+    臨時全域変数　vn_R値_みこふぶ吹き出し　= 120
+    臨時全域変数　vn_R値_インベントリ    　= 80//以上
+    //臨時全域変数　vn_R値_みこふぶ吹き出し　= 都度可変　白窓より上
+    
+    //セットで使用して可変するーーーーーーーーーーーー
+    //臨時全域変数　vn_R値_みこふぶ吹き出し　= 120
+    //M_宣言文字窓miko吹き出し
+    //ーーーーーーーーーーーーーーーーーーーーーーーー
+    
+    臨時全域変数　vn_R値_場転ボタン　= 79//以上
+    
+    //臨時全域変数　vn_R値_通常直接吹き出し　= 都度可変 30
+    //臨時全域変数　vn_R値_小道具&trap　= 都度可変　0から20
+    
+    
+}
+
+スクリプト終了
+待機 続行禁止
+
+//----------------------------------------------------
+
+栞　func_シナリオタイトル_miko
+
+{
+
+   全域変数　scenariotitle_miko0  =　"すとーりー＆ちゅーとりある"
+   全域変数　scenariotitle_miko1  =　"○○の手も借りたい"
+   全域変数　scenariotitle_miko2   =　"寝癖、大丈夫？？"
+   全域変数　scenariotitle_miko3   =　"ウーバーござるにおまかせ！"
+   全域変数　scenariotitle_miko4   =　"失礼しますマリン船長"
+   //
+   //"お帰り、伝説のドラゴン"
+   //"ぺこみこの絆"
+   //"アイテム錬成　こよりbox！"
+   //"愛を叫んで育てこのアホ毛！"
+   全域変数　scenariotitle_miko5   =　""
+   全域変数　scenariotitle_miko6   =　"ホロぐら「起こすな」"
+   全域変数　scenariotitle_miko7   =　"ちょっと一息、マリン船長"
+   全域変数　scenariotitle_miko8   =　"旧事務所版ホロハチ??"
+   全域変数　scenariotitle_miko9   =　"失礼しますノエル団長"
+   全域変数　scenariotitle_miko10   =　"み俺恥PONでみっく！"
+   全域変数　scenariotitle_miko11   =　"miko11"
+   全域変数　scenariotitle_miko12   =　"クイズ★ホロリーグ①"
+   全域変数　scenariotitle_miko13   =　"落ち葉がいっぱい"
+   全域変数　scenariotitle_miko14   =　"ホロぐら「電車ごっこ」"
+   全域変数　scenariotitle_miko15   =　"miko15"
+   全域変数　scenariotitle_miko16   =　"青くゆ★マジックショー"
+   全域変数　scenariotitle_miko17   =　"miko17"
+   全域変数　scenariotitle_miko18   =　"赤いなぁ…"
+   全域変数　scenariotitle_miko19   =　"miko19"
+   全域変数　scenariotitle_miko20   =　"ヒットマン「暁」"
+   全域変数　scenariotitle_miko21   =　"miko21"
+   全域変数　scenariotitle_miko22   =　"みんなで歌を歌おう！"
+   全域変数　scenariotitle_miko23   =　"miko23"
+   全域変数　scenariotitle_miko24   =　"miko24"
+   全域変数　scenariotitle_miko25   =　"miko25"
+   全域変数　scenariotitle_miko26   =　"miko26"
+   全域変数　scenariotitle_miko27   =　"27番下さいぺこ～"
+   全域変数　scenariotitle_miko28   =　"miko28"
+   全域変数　scenariotitle_miko29   =　"miko29"
+   全域変数　scenariotitle_miko30   =　"miko30"
+   全域変数　scenariotitle_miko31   =　"miko31"
+   全域変数　scenariotitle_miko32   =　"miko32"
+   全域変数　scenariotitle_miko33   =　"miko33"
+   全域変数　scenariotitle_miko34   =　"miko34"
+   全域変数　scenariotitle_miko35   =　"miko35"
+    全域変数保存
+//文字 gostage_name  500 10 100  r-mplus-1c-m.ttf 50 "{{clearedlevel_miko}}"
+スクリプト終了
+}
+待機 続行禁止
+//----------------------------------------------------
+
+栞　func_シナリオタイトル_suba
+
+{
+
+   全域変数　scenariotitle_suba0  =　"すとーりー＆ちゅーとりある"
+   全域変数　scenariotitle_suba1  =　""
+   全域変数　scenariotitle_suba2   =　""
+   全域変数　scenariotitle_suba3   =　""
+   全域変数　scenariotitle_suba4   =　""
+   全域変数　scenariotitle_suba5   =　"鏡よ鏡"
+   全域変数　scenariotitle_suba6   =　"ほろぐら編その壱"
+   全域変数　scenariotitle_suba7   =　"人のふり見て我がふり正せ"
+   全域変数　scenariotitle_suba8   =　"八番出口に逃げ込んだアイツ"
+   全域変数　scenariotitle_suba9   =　"み俺恥ハザード"
+   全域変数　scenariotitle_suba10   =　"suba10"
+   全域変数　scenariotitle_suba11   =　"suba11"
+   全域変数　scenariotitle_suba12   =　"suba12"
+   全域変数　scenariotitle_suba13   =　"suba13"
+   全域変数　scenariotitle_suba14   =　"suba14"
+   全域変数　scenariotitle_suba15   =　"suba15"
+   全域変数　scenariotitle_suba16   =　"suba16"
+   全域変数　scenariotitle_suba17   =　"suba17"
+   全域変数　scenariotitle_suba18   =　"suba18"
+   全域変数　scenariotitle_suba19   =　"suba19"
+   全域変数　scenariotitle_suba20   =　"suba20"
+   全域変数　scenariotitle_suba21   =　"suba21"
+   全域変数　scenariotitle_suba22   =　"suba22"
+   全域変数　scenariotitle_suba23   =　"suba23"
+   全域変数　scenariotitle_suba24   =　"suba24"
+   全域変数　scenariotitle_suba25   =　"suba25"
+   全域変数　scenariotitle_suba26   =　"suba26"
+   全域変数　scenariotitle_suba27   =　"suba27"
+   全域変数　scenariotitle_suba28   =　"suba28"
+   全域変数　scenariotitle_suba29   =　"suba29"
+   全域変数　scenariotitle_suba30   =　"suba30"
+   全域変数　scenariotitle_suba31   =　"suba31"
+   全域変数　scenariotitle_suba32   =　"suba32"
+   全域変数　scenariotitle_suba33   =　"suba33"
+   全域変数　scenariotitle_suba34   =　"suba34"
+   全域変数　scenariotitle_suba35   =　"suba35"
+    
+    全域変数保存
+スクリプト終了
+}
+待機 続行禁止
+~スクリプト /Plugins/lvui/_system/macros.txt
+.スクリプト　game_startsetup.txt　func_共通レイヤー設定
+    絵0 fukidasi UI/ui_fukidasi_{{ gamemode}}.png 950 130 81
+    絵0 selected_img item/itemui_selected_{{ gamemode}}.png 820 -149 82
+    拡大　selected_img,  fukidasi 　25%
+    .イン　 fukidasi 10
+    イン　selected_img
+    
+    背景 back_inventory Back/back_inventory.png 0 0 80
+//----------------------------------------------------
+//gameoverアニメ集
+//----------------------------------------------------
+//スクリプト　game_startsetup.txt　gameoverアニメ_マグマ遊泳　_X _Y _Ray
+栞　gameoverアニメ_マグマ遊泳　_X _Y _Ray　_endtxt
+{
+     
+    絵0　ANI_gameO　anime_gameover/ANI_gameO_maguma01.png　 (_X) (_Y) (_Ray)
+    拡大　ANI_gameO 20%
+    .イン　ANI_gameO　200
+    待機　1200
+    透明度　ANI_gameO　0
+    .画像　ANI_gameO　anime_gameover/ANI_gameO_maguma02.png
+    .イン　ANI_gameO　200
+    待機　1200
+    透明度　ANI_gameO　0
+    .画像　ANI_gameO　anime_gameover/ANI_gameO_maguma03.png
+    .移動y2　ANI_gameO　50
+    .イン　ANI_gameO　200
+    待機　1200
+    透明度　ANI_gameO　0
+    .画像　ANI_gameO　anime_gameover/ANI_gameO_maguma04.png
+    .イン　ANI_gameO　200
+    待機　1200
+    
+    .ジャンプ　game_startsetup.txt　ステージ終了メイン  "gameover"　"02"　(_endtxt)
+    
+     スクリプト終了
+}
+
+待機 続行禁止
+
+    
+//----------------------------------------------------
+//スクリプト　game_startsetup.txt　gameoverアニメ_金時
+栞　gameoverアニメ_金時
+{
+    
+     画面領域開始　sc_story
+    スクリプト /Plugins/lvui/_system/menu.txt
+     待機　400
+    
+    //灰色背景
+    絵0 white_top white_full_1024.png 0 0 (vn_R値_負けアニメ) カメラ付着
+    色調　white_top　#696969
+    透明度　 white_top 200 0
+    拡大2　white_top　-3% 50%
+    
+    
+    //立ち絵
+    ~絵0　story_hito_kintA　hito/kintoki_01.png -110 -50 (vn_R値_負けアニメ+1)
+    ~絵0　story_hito_kintB　effects/eff_beam01.png -200 -100 (vn_R値_負けアニメ+3)
+    ~絵0 story_hito_mikoA　hito/miko_mini02.png 500 -50 (vn_R値_負けアニメ+1)
+    ~絵0　story_hito_mikoB　hito/miko_mini06.png 500 -50 (vn_R値_負けアニメ+2)
+    マスク　敗北マスクA　mask/mask_768_768.png　500 -50 303
+    マスク　敗北マスクB　mask/mask_768_768.png　150 0 300
+    拡大　敗北マスクA　40%
+    拡大　敗北マスクB　100% 50%
+    マスク反映2　story_hito_mikoB　敗北マスクA
+    マスク反映2　story_hito_kintB　敗北マスクB
+    回転z story_hito_kintB 170
+    回転z 敗北マスクB 170
+   　拡大　story_hito_kintA.* 80%
+   　拡大　story_hito_kintB.* 60%
+   　拡大　story_hito_miko.* 40%
+   　イン　story_hito.* 
+   
+    臨時全域変数　vn_R値_みこふぶ吹き出し　= 310
+   
+    待機　500
+    
+   ~ 入力禁止  false
+    
+    M_宣言文字窓その他吹き出し false "負け金時"　"金時"　"void"　"#AA00FF" 400 100 (vn_R値_負けアニメ+5) 180
+    移動x2　txtfuki_負け金時_skin　50
+    拡大y2　txtfuki_負け金時_skin　30% 100
+    イン txtfuki_負け金時 300
+    待機　300
+    //~文字速度 150
+   ~文字サイズ　30
+    文字行サイズ  53
+    "見　つ　け　た　ニ　ェ　 \w
+    .垢のっとり凍結ビーーーム！！
+    
+    ~
+    
+    効果音　se_obj se_kei_beam01.ogg
+    移動x2　敗北マスクB　800 500
+    待機　800
+    臨時全域変数　vn_R値_みこふぶ吹き出し　= 260
+    M_宣言文字窓miko吹き出し 
+   ~文字サイズ　40
+    文字行サイズ  53
+    "うわぁぁぁぁぁ!!!
+    ~
+    ボイス　vo_obj vo_miko_nige.ogg
+    移動y2　敗北マスクA　-300 2000
+    待機　2500
+    
+    
+　
+    アウト　.* 　300
+    待機　300
+    画面領域終了　sc_story
+    .ジャンプ　game_startsetup.txt　ステージ終了メイン  "gameover"　"03"　"金時に見つかった"
+    
+     スクリプト終了
+}
+
+待機 続行禁止
+    
+
+//----------------------------------------------------
+//スクリプト　game_startsetup.txt　gameoverアニメ_35Pカツアゲ
+栞　gameoverアニメ_35Pカツアゲ　_X _Y
+{
+    
+    
+   画面領域開始　sc_story　原点回帰時解除
+    絵0 black_top black_full_1280.png 0 -650 75 カメラ付着
+    絵0 black_bot black_full_1280.png 0 650 75 カメラ付着
+    透明度　 black_.* 150 200
+   //  絵0　anime_mikoP komono/35p_05.png  300 80 20
+   //  絵0　anime_miko anime_action/ANI_act_mikosenaka01.png  150 150 20
+     絵0　anime_mikoP komono/35p_05.png ( _X) (_Y) 20
+     絵0　anime_miko hito/ANI_act_mikosenaka01.png (_X- 150) (_Y+70) 20
+     拡大　anime_miko.*　50%
+    .イン　anime_miko.*　500
+    待機　1000
+    
+     .ボイス　obj_SE　vo_miko_jump.ogg
+    .移動y2　anime_mikoP　-100　250
+    待機　300
+    .移動y2　anime_mikoP　100　250
+    待機　700
+    .移動y2　anime_mikoP　-100　250
+    待機　300
+    .移動y2　anime_mikoP　100　250
+    待機　250
+    
+     絵0　anime_saifu  item/item_saifu.png  250 250 21
+     //拡大　anime_saifu　50%
+     親子　anime_mikoP　anime_saifu
+     .イン　anime_saifu　50
+     待機　50
+     移動x2　anime_saifu　50 150
+     移動y2　anime_saifu　150 150 a5
+    待機　700
+    
+    
+   画面領域終了　sc_story
+   .スクリプト　game_item.txt　get_item_msg  5 "saifu"　"35pの財布"
+   待機　100
+  .画面領域開始　sc_story　原点回帰時解除
+    アウト　anime_saifu　10
+     絵　anime_suba  hito/ANI_act_suba01.png (_X-800) (_Y+70) 20
+     拡大　anime_suba　50%
+    移動x　anime_suba　-50　300
+    .ボイス　obj_VO　vo_suba_oozorakeisatu.ogg
+    
+   画面領域終了　sc_story
+   .ジャンプ　game_startsetup.txt　ステージ終了メイン　"gameover"　"04"　"カツアゲ罪"
+     スクリプト終了
+    
+}
+待機　続行禁止
+
+//----------------------------------------------------
+//スクリプト　game_startsetup.txt　gameoverアニメ_エロゲ誤爆
+栞　gameoverアニメ_エロゲ誤爆
+{
+    
+    
+    //エロゲ誤爆
+    
+    色調 storymiko_TV 0 0 0 0
+    
+    効果音　anime_SE　se_kei_rimokon.ogg
+    "アレ？？ \w
+    ~
+    
+    .効果音　anime_SE　se_kei_eroge01.ogg
+   画像　  storymiko_TV　story/storymiko_eroge01.png
+   待機　2000
+   
+    .効果音　anime_SE　se_kei_eroge02.ogg
+    
+   待機　2000
+    .効果音　anime_SE01　se_kei_eroge03.ogg
+    色調 storymiko_TV 255 255 255 0
+    待機　10000
+    
+    色調 storymiko_TV 0 0 0 0
+    
+    待機　1000
+    アウト　.* 　300
+    待機　300
+    画面領域終了　sc_story
+  スクリプト    game_startsetup.txt　ステージ終了メイン  "gameover"　"06"　"ギャルゲー誤爆"
+   
+     スクリプト終了
+    
+}
+待機　続行禁止
+
+//----------------------------------------------------
+//スクリプト　game_startsetup.txt　gameoverアニメ_逃走 _endtxt _エネミーobjpass　_エネミーx _エネミーy _エネミー拡大率
+    
+栞　gameoverアニメ_逃走 _endtxt _エネミーobjpass　_エネミーx _エネミーy _エネミー拡大率
+{
+    
+    
+  背景0　stage_end_img Back/back_gameover_miko_00.png 0 0 (vn_R値_ステ終了窓)
+  絵0　stage_end_miko hito/miko_mini20.png 100 50 (vn_R値_ステ終了窓 +1)
+  拡大　stage_end_miko　60%
+  //絵0　stage_end_エネミー hito/marin_kuma01.png 400 -50 91
+  //拡大　stage_end_エネミー　{{_エネミー拡大率}}
+  
+  絵0　stage_end_エネミー hito/{{_エネミーobjpass}}.png (_エネミーx) (_エネミーy) (vn_R値_ステ終了窓 +1)
+  拡大　stage_end_エネミー　{{_エネミー拡大率}}%
+  移動y2 stage_end_.* -600 0 
+  イン　stage_end_.*
+  スクリプト game_startsetup.txt　ステージ終了メイン  "gameover"　"00"　(_endtxt) "vo_miko_nige"
+   
+     スクリプト終了
+    
+}
+待機　続行禁止
+
+    
+    
+
+//---------------------------------------------------------------
+//.ジャンプ　game_startsetup.txt　ステージ終了メイン　結果　imgNo　_endtxt
+栞　ステージ終了メイン　結果　imgNo　_endtxt _endvoicepass
+{
+    
+    画面領域開始　stage_end_sc  原点回帰時解除
+    入力禁止 true
+    
+    もし ( 結果 == "stageclear")  スクリプト　game_startsetup.txt　 到達レベルのセーブ
+    
+    
+    もし ( 結果 == "stageclear") 変数 resultTF = true
+    違ってももし ( 結果 == "gameover" ) 変数 resultTF = false  
+    違ったら　システムエラ　"代入値ミス"
+    
+    //デバック文字＿＿＿＿＿＿＿＿
+    もし ( 結果 == "stageclear")   文字 NowTime 1000 10 100  r-mplus-1c-m.ttf 50 "stageclear"    
+    違ってももし ( 結果 == "gameover" )  文字 NowTime 1000 10 100  r-mplus-1c-m.ttf 50 "gameover"    
+    //________________________
+    
+    
+    背景　stage_end_img Back/back_{{結果}}_{{gamemode}}_{{imgNo}}.png 0 -600 (vn_R値_ステ終了窓)
+    
+    作成焦点 0.5 1.0 0.5
+    もし ( 結果 == "gameover" ) 文字　stage_end_mojiA  650 -480 (vn_R値_ステ終了窓 +2)   r-mplus-1c-m.ttf  50  中央　"死因"
+    もし ( 結果 == "gameover" ) 文字　stage_end_mojiB  650 -430 (vn_R値_ステ終了窓 +2)   r-mplus-1c-m.ttf  50  中央　"{{_endtxt}}"
+    作成焦点 初期値
+    //文字　vn_stgtitle_moji  500 100 405   r-mplus-1c-m.ttf  50  "{{a}}"
+    移動y2 stage_end_.* 600 500 全画面領域
+    待機　500
+    もし (_endvoicepass != undefined) ボイス　miko_endvo {{_endvoicepass}}.ogg
+    待機　200
+    .スクリプト　game_startsetup.txt　ステージ終了時ボタン　 resultTF 
+   
+  
+    .入力禁止 false
+    待機 続行禁止
+    
+    入力禁止 true
+     画面領域終了　stage_end_sc 
+    スクリプト終了
+}
+待機 続行禁止
+//----------------------------------------------------
+栞　到達レベルのセーブ
+{
+    
+    もし ( gamemode == "miko" )  スクリプト　GlobalNo.txt　GlobalNo  "clearedlevel_miko"  ( lvMax(now_stageNo,  clearedlevel_miko))
+    もし ( gamemode == "suba" )  スクリプト　GlobalNo.txt　GlobalNo  "clearedlevel_suba"   ( lvMax(now_stageNo,  clearedlevel_suba))
+   . 待機　5
+    .全域変数保存
+    
+    
+    
+    
+    スクリプト終了
+}
+待機 続行禁止
+//----------------------------------------------------
+栞 ステージ終了時ボタン　_result
+{
+    
+    //未クリア時には非表示で
+    変数　_result　= false
+    タッチ素材設定 UI/ui_Btn_{{gamemode }}01.png UI/ui_Btn_{{gamemode }}02.png UI/ui_Btn_{{gamemode }}03.png se_maoudamashii_onepoint26.ogg se_maoudamashii_onepoint30.ogg
+    もし ( _result)  ボタン0 stage_end_btn0    150 500 (vn_R値_ステ終了窓 +1) 最終ジャンプ  game_startsetup.txt nextscenario 1
+    違ったら  ボタン0 stage_end_btn0    150 500 (vn_R値_ステ終了窓 +1) ダイアログ "本当にヒントを見ますか？" スクリプト /Plugins/lvui/_system/menu.txt　ネタバレヒント_main
+    もし (_result　== false)  ボタン文字 stage_end_btn0 r-mplus-1c-m.ttf  120  0  50 "妖精のヒント"
+    違ってももし (( gamemode == "miko" ) && _result)  ボタン文字 stage_end_btn0 r-mplus-1c-m.ttf  150  0  50 "つぎの日"
+    違ってももし (( gamemode == "suba" ) && _result)  ボタン文字 stage_end_btn0 r-mplus-1c-m.ttf  150  0  50 "次の事件"
+    
+    ボタン0 stage_end_btn1    330 500 (vn_R値_ステ終了窓 +1) スクリプト /Plugins/lvui/_system/stageselect.txt display
+    もし ( gamemode == "miko" )  ボタン文字 stage_end_btn1 r-mplus-1c-m.ttf  140  0  50 "ステージ選択"
+    もし ( gamemode == "suba" )  ボタン文字 stage_end_btn1 r-mplus-1c-m.ttf  150  0  50 "StageSelect"
+    
+    
+   ボタン0 stage_end_btn2    510 500 (vn_R値_ステ終了窓 +1) 最終ジャンプ game_startsetup.txt nextscenario 0
+    もし ( gamemode == "miko" )　ボタン文字 stage_end_btn2 r-mplus-1c-m.ttf  150  0  50 "もう一度"
+     もし ( gamemode == "suba" ) 　ボタン文字 stage_end_btn2 r-mplus-1c-m.ttf  150  0  50 "retry"
+    
+     
+   ボタン0 stage_end_btn3    690 500 (vn_R値_ステ終了窓 +1) ダイアログ "タイトルへ戻りますか？" スクリプト /Plugins/lvui/_system/menu.txt to_title
+    もし ( gamemode == "miko" )　ボタン文字 stage_end_btn3 r-mplus-1c-m.ttf  150  0  50 "タイトル"
+     もし ( gamemode == "suba" ) 　ボタン文字 stage_end_btn3 r-mplus-1c-m.ttf  150  0  50 " ReturnTitle"
+    
+
+    
+   
+    .文字色  stage_end_btn.* #FFFFFF
+   .もし ( gamemode == "miko" ) 文字陰   stage_end_btn.* 1  30  #ED7783 0 0
+   .もし ( gamemode == "suba" ) 文字陰   stage_end_btn.* 1  30  #00AEFF 0 0
+    .拡大 stage_end_btn.* 40%
+    .イン stage_end_btn.* 300
+    
+    スクリプト終了
+}
+
+待機 続行禁止
+    
+    
+    
+    
+

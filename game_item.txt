@@ -1,0 +1,826 @@
+栞　デバッグMaine
+{
+    
+//------------------------------------------------------
+//デバッグ用変数←最後には全て消すこと
+//------------------------------------------------------
+//ゲームモード設定
+臨時全域変数 gamemode  = "miko"
+//臨時全域変数 gamemode  = "suba"
+
+//------------------------------------------------------
+
+~スクリプト /Plugins/lvui/_system/macros.txt
+    .スクリプト　game_startsetup.txt　func_共通レイヤー設定
+    スクリプト　game_item.txt　アイテム初期処理
+
+//------------------------------------------------------
+//デバッグ用変数←最後には全て消すこと
+//------------------------------------------------------
+//iteminventoryへのitem格納
+
+
+    スクリプト　game_item.txt　get_item  0 "hasami"　"はさみ"
+    スクリプト　game_item.txt　get_item  0 "hasami"　"はさみ"
+    スクリプト　game_item.txt　get_item_msg  1 "mizu"　"スバルの手錠"
+    スクリプト　game_item.txt　get_item_msg  1 "mizu"　"スバルの手錠"
+    スクリプト　game_item.txt　get_item_msg  1 "mizu"　"スバルの手錠"
+    スクリプト　game_item.txt　get_item_msg  2 "hasami"　"スバルの手錠"
+
+　スクリプト　game_item.txt　アイテム減少　1
+　スクリプト　game_item.txt　アイテム減少　1
+　スクリプト　game_item.txt　アイテム減少　1
+　スクリプト　game_item.txt　アイテム減少　1
+    スクリプト　game_item.txt　get_item_msg  3 "hasami"　"スバルの手錠"
+    スクリプト　game_item.txt　get_item_msg  "最小空箱" "hasami"　"はさみ"
+    スクリプト　game_item.txt　get_item_msg  "最小空箱" "mizu"　"スバルの手錠"
+    スクリプト　game_item.txt　get_item_msg  "最小空箱" "mizu"　"スバルの手錠"
+    スクリプト　game_item.txt　get_item_msg  "最小空箱" "maguma"　"まぐま"
+    スクリプト　game_item.txt　アイテム減少　"hasami"
+    スクリプト　game_item.txt　アイテム減少　"maguma"
+    スクリプト　game_item.txt　アイテム減少　"maguma"
+    スクリプト　game_item.txt　アイテム消去　"mizu"
+    
+    
+/*
+    スクリプト　game_item.txt　get_item_msg  2 "hasami"　"はさみ"
+    スクリプト　game_item.txt　get_item_msg  3 "hasami"　"はさみ"
+    スクリプト　game_item.txt　get_item_msg  4 "hasami"　"はさみ"
+    スクリプト　game_item.txt　アイテム消去　3
+    スクリプト　game_item.txt　get_item  5 "hasami"　"はさみ"
+    スクリプト　game_item.txt　get_item  6 "hasami"　"はさみ"
+*/
+//------------------------------------------------------
+
+}
+スクリプト終了
+待機　続行禁止
+
+
+//---------------------------------------------------------------
+
+栞　アイテム初期処理
+{
+    
+    
+    //今手に持っているものの名前とinventory番号
+    臨時全域変数　selecting　= "NoHand"
+    臨時全域変数　selecting_No　= -1
+    //inventoryに格納されるアイテムの名前とpass、個数
+    臨時全域変数　inventorypass　=　lvCreateVarList(6)
+    臨時全域変数　inventoryname　=　lvCreateVarList(6)
+    臨時全域変数　inventoryQTE　=　lvCreateVarList(6,0)
+    //初期化　全て"NoHand" "undefined"
+    スクリプト　/Plugins/lvui/_system/events.txt 　func_反復実行改 0 5　"game_item" "アイテム消去" 
+    //M_スクリ_反復実行改 0 5 "game_item" "アイテム消去" 
+    //反復実行 0 5 "スクリプト　game_item.txt　アイテム消去  {} "
+    
+    
+    //↑エラー！順番に処理させる構文を作ろう
+    背景 back_inventory Back/back_inventory.png 0 0 (vn_R値_インベントリ)
+    //拡大　back_inventory　25%
+    絵0 fukidasi UI/ui_fukidasi_{{ gamemode}}.png 950 130 ((vn_R値_インベントリ)+1)
+    絵0 selected_img item/itemui_selected_{{ gamemode}}.png 820 -149 ((vn_R値_インベントリ)+2)
+    拡大　selected_img,  fukidasi 　25%
+    .イン　 fukidasi 10
+　　　　スクリプト終了
+    
+}
+待機　続行禁止
+
+
+//---------------------------------------------------------------
+//指定ボタンを消去した後に該当アイテムを手に入れる
+//スクリプト game_item.txt　アイテムボタン回収　_obj　_inventoryNo　_itempass　_itemname
+栞　アイテムボタン回収　_obj　_inventoryNo　_itempass　_itemname
+{
+    
+   　
+    アウト　{{_obj}}
+    アウト　fukidasi_target
+    .スクリプト　game_item.txt　 get_item_msg　_inventoryNo　_itempass　_itemname
+    
+    
+}
+
+スクリプト終了
+待機　続行禁止
+
+
+//---------------------------------------------------------------
+//アイテムを拾う→inventoryに格納する栞関数　引数→　番号　アイテム名
+
+///////////////////
+//通常使い方
+///////////////////
+
+//0番に挿入
+//スクリプト　game_item.txt　get_item_msg  0 "hasami"　"はさみ"
+//空いている最小番号の格納先探索、同名アイテムがある場合は優先
+//スクリプト　game_item.txt　get_item_msg  "最小空箱" "hasami"　"はさみ"
+//決まったアイテムを置換
+//スクリプト　game_item.txt　get_item_msg  "kagi" "hasami"　"はさみ"
+
+//ーーーーーーーーーーーー
+//クリアコマンド
+//スクリプト　game_item.txt　get_item_msg  5 "taiyaki"　"たい焼き"
+
+///////////////////
+//場面転換ボタンオーバーライド　使い方
+///////////////////
+//スクリプト　game_item.txt　get_item_msg　「ボタンobj」　　　　　　　　　　　「アイテムぱす」　"場面転換ボタン"
+//スクリプト　game_item.txt　get_item_msg　ui_Btn_MIGI_MDL_child　"Btn_MIGI01"　"場面転換ボタン"
+//スクリプト　game_item.txt　get_item_msg　ui_Btn_MIGI_MDL_child　"Btn_HIDARI01"　"場面転換ボタン"
+
+栞　get_item_msg　_itemNoモード　_itempass　_itemname
+{
+   
+    
+    //ここから作画　アイテムを拾いました！表示
+    絵0　ui_msg_itemget_img　item/item_{{_itempass}}.png　250 80 (vn_R値_アイテム窓 +1)
+    拡大　ui_msg_itemget_img　50%
+    画面領域開始　sc_ui_msg_itemget
+    背景0　ui_msg_itemget　UI/ui_msg_itemget_{{ gamemode}}.png 0 0 (vn_R値_アイテム窓)
+  
+    タッチ素材設定 UI/ui_Btn_{{gamemode }}01.png UI/ui_Btn_{{gamemode }}02.png UI/ui_Btn_{{gamemode }}03.png se_maoudamashii_onepoint26.ogg se_maoudamashii_system46.ogg
+    ボタン0 ui_msg_itemget_BtnA    300 350 (vn_R値_アイテム窓 +2)　続行
+    ボタン文字 ui_msg_itemget_BtnA r-mplus-1c-m.ttf  60  0  50 "ok"
+    
+    //文字 NowTime 1000 10 100  r-mplus-1c-m.ttf 50 "すてーじ "
+    文字0　ui_msg_itemget_BtnB　500 220 (vn_R値_アイテム窓 +5)  r-mplus-1c-m.ttf 30 　横　中央　"{{_itemname}}"
+    .文字色  ui_msg_itemget_Btn.* #FFFFFF
+   　// . 文字太字  title_main.*  true
+   　.もし ( gamemode == "miko" ) 文字陰  ui_msg_itemget_Btn.* 1  10  #fe4b74 0 0
+   　.もし ( gamemode == "suba" ) 文字陰   ui_msg_itemget_Btn* 1  10  #00AEFF 0 0
+    .拡大 ui_msg_itemget_BtnA  60%　全画面領域
+    移動y2　ui_msg_itemget.* -600　全画面領域
+    .イン ui_msg_itemget.* 300　全画面領域
+    移動y2　ui_msg_itemget.* 600 100　全画面領域
+    入力禁止　 false
+    待機　
+    
+   　入力禁止  true
+    
+    
+    .アウト　ui_msg_itemget.* 300　
+    //******************
+    //場面転換ボタンのアイテム回収オーバーライド処理prog
+    
+    もし　(_itemname == "場面転換ボタン") 入力禁止　 false
+    もし　(_itemname == "場面転換ボタン")　画面領域終了　sc_ui_msg_itemget
+    もし　(_itemname == "場面転換ボタン")　スクリプト　game_item.txt　アイテム_場面転換ボタン　(_itemNoモード)　(_itempass)
+    もし　(_itemname == "場面転換ボタン")　スクリプト終了
+    //ーーーーーーーー
+    //ーーーーーーーー
+    //_inventoryNo決定措置
+    //ーーーーーーーー
+    //もし (_itemNoモード)　
+    
+    // ( _itemNoモード == 0）→そのまま代入返り値
+    //　( _itemNoモード == "hasami"）→　"hasami"格納Noを探して置換
+    もし ( _itemNoモード == "最小空箱" ) スクリプト　game_item.txt　アイテム格納先探索_繰り返し　_itempass　0　-1
+    違ったら　スクリプト game_item.txt　func_itemNoモード内容変換探索　(_itemNoモード)
+    変数　_inventoryNo　= 返り値
+    変数消去　返り値
+    
+    
+    //-1になる条件
+    //①インベントリ箱がすべていっぱい→ステージごとの出現アイテムの最大数でカバー
+    //②アイテム置き換えや消去時にそのアイテムを持っていない場合　あらかじめ呼び出す前に条件式で調べておく
+    もし　(_inventoryNo　< 0)　システムエラ　"該当アイテムが存在しない、あるいは引数命令ミス"
+    
+    
+    
+    移動　ui_msg_itemget_img　(130 * (_inventoryNo%2)  + 820 ) ((_inventoryNo/2)*133 -150)  300 全画面領域
+    拡大　ui_msg_itemget_img　25%  300 全画面領域
+    待機　400
+    
+    入力禁止　 false
+   　.画面領域終了　sc_ui_msg_itemget
+    //アイテムがたい焼きだった時はクリアに。
+    .もし　( (_itemname =="たい焼き") && ( gamemode  == "miko")) ジャンプ　game_startsetup.txt　ステージ終了メイン　 "stageclear" 　"01"　""
+    //.もし　( (_itemname =="35pの財布") && ( gamemode  == "miko")) ジャンプ　game_startsetup.txt　ステージ終了メイン　 "gameover" 　"01"　""
+    
+    
+    //内部処理
+   入力禁止  true
+    スクリプト　game_item.txt　get_item　_inventoryNo　_itempass　_itemname
+    .アウト　ui_msg_itemget_img
+    入力禁止　 false
+    スクリプト終了
+    
+}
+待機 続行禁止
+
+//---------------------------------------------------------------
+////内部処理(メッセージ挟まず直接与える時はこちら)(初期装備など)
+//---------------------------------------------------------------
+    
+栞　get_item　_inventoryNo　_itempass　_itemname
+{
+    
+   
+   //個数チェックとその更新
+   //もし ( inventoryname[{{_inventoryNo}}]  == _itemname) スクリプト　game_item.txt　アイテム個数プラス
+   //違ったら　スクリプト　game_item.txt　アイテム個数壱
+   もし ( inventoryname[{{_inventoryNo}}]  == _itemname) 臨時全域変数　inventoryQTE[{{_inventoryNo}}]　+= 1
+   違ったら　臨時全域変数　inventoryQTE[{{_inventoryNo}}]　= 1
+   
+    
+    臨時全域変数　inventorypass[{{_inventoryNo}}]　= _itempass
+    臨時全域変数　inventoryname[{{_inventoryNo}}]  = _itemname
+    
+    変数　tempQTE = inventoryQTE[{{_inventoryNo}}]
+    
+    タッチ素材設定　item/item_{{_itempass}}.png  item/item_{{_itempass}}.png  item/item_{{_itempass}}.png  
+    ボタン0 Btn_inventory{{_inventoryNo}} (130 * (_inventoryNo%2)  + 820 )   ((_inventoryNo/2)*133 -150) (vn_R値_インベントリ +1) スクリプト　game_item.txt　アイテム持ち替えSorF　{{_inventoryNo}}
+    タッチ開始時　Btn_inventory{{_inventoryNo}}　スクリプト　game_item.txt　アイテム名表示　　{{_inventoryNo}}
+    拡大　Btn_inventory{{_inventoryNo}}　25%
+    .イン　 Btn_inventory{{_inventoryNo}} 300
+    文字0 mojiQTE_inventory{{_inventoryNo}} (140 * (_inventoryNo%2)  + 1090 )   (133*(_inventoryNo/2)+160)  (vn_R値_インベントリ +20)  r-mplus-1c-m.ttf 40 "×{{tempQTE}} "
+   もし ( tempQTE >= 2)  イン mojiQTE_inventory{{_inventoryNo}} 10
+   違ったら　透明度　mojiQTE_inventory{{_inventoryNo}}　0 10
+
+}
+
+スクリプト終了
+待機 続行禁止
+//---------------------------------------------------------------
+//アイテムインベントリUI状態更新
+//---------------------------------------------------------------
+栞　アイテムインベントリUI状態更新　_inventoryNo　
+{
+    
+   
+    
+    変数 _itempass　=　inventorypass[{{_inventoryNo}}]
+    変数　tempQTE = inventoryQTE[{{_inventoryNo}}]
+    
+    もし　(_itempass == "undefined" ) スクリプト game_item.txt　アイテム消去
+    もし　(tempQTE  <= 0)　スクリプト　game_item.txt　アイテム消去　(_inventoryNo)
+    
+    タッチ素材設定　item/item_{{_itempass}}.png  item/item_{{_itempass}}.png  item/item_{{_itempass}}.png  
+    ボタン0 Btn_inventory{{_inventoryNo}} (130 * (_inventoryNo%2)  + 820 )   ((_inventoryNo/2)*133 -150) (vn_R値_インベントリ +1) スクリプト　game_item.txt　アイテム持ち替えSorF　{{_inventoryNo}}
+    タッチ開始時　Btn_inventory{{_inventoryNo}}　スクリプト　game_item.txt　アイテム名表示　　{{_inventoryNo}}
+    拡大　Btn_inventory{{_inventoryNo}}　25%
+    .イン　 Btn_inventory{{_inventoryNo}} 300
+    文字0 mojiQTE_inventory{{_inventoryNo}} (140 * (_inventoryNo%2)  + 1090 )   (133*(_inventoryNo/2)+160)  (vn_R値_インベントリ +20)  r-mplus-1c-m.ttf 40 "×{{tempQTE}} "
+   もし ( tempQTE >= 2)  イン mojiQTE_inventory{{_inventoryNo}} 10
+   違ったら　透明度　mojiQTE_inventory{{_inventoryNo}}　0 10
+
+}
+
+スクリプト終了
+待機 続行禁止
+//---------------------------------------------------------------
+//インベントリNo探索、変換
+//---------------------------------------------------------------
+//_itemNoモードの型を調べたうえで返り値として指定されたの箱Noを返す関数
+//スクリプト　game_item.txt　func_itemNoモード内容変換探索　(_itemNoモード)
+//   変数消去　返り値
+栞　func_itemNoモード内容変換探索　_itemNoモード
+{
+    
+    変数消去　返り値
+    スクリプト　/Plugins/lvui/_system/events.txt 　func_変数型判定 (_itemNoモード)
+    変数　型ルート判別 = 返り値
+    変数消去　返り値
+    //システムエラ　"{{型ルート判別}}"
+    もし　(型ルート判別) 臨時全域変数　返り値　= _itemNoモード //数値のとき　そのまま代入
+    違ったら　スクリプト game_item.txt　アイテム格納先探索_繰り返し　(_itemNoモード)　0　-2 //特定アイテムの置き換え
+    //臨時全域変数　返り値 = 返り値
+    スクリプト終了
+    
+｝
+
+//返り値として指定されたアイテムpassの入っている箱Noを返す関数
+// スクリプト game_item.txt アイテム格納先探索 (_itemNoモード)　0　-2 //同名アイテム検索
+// スクリプト game_item.txt アイテム格納先探索 (_itemNoモード)　0　-1 //最小空箱検索（同名アイテム優先）
+//    変数消去　返り値
+栞　アイテム格納先探索_繰り返し　_itempass　_i　_最小数値
+{
+    // 終端
+    // 同種アイテムがあれば最優先
+    もし ( inventorypass[_i] == _itempass ) 臨時全域変数　返り値　= _i
+    もし ( inventorypass[_i] == _itempass ) スクリプト終了
+
+    // 空箱の最小番号を記録
+    もし ( ( inventorypass[_i] == "undefined") && (_最小数値 == -1) )　変数　_最小数値 = _i
+    
+    
+    もし　(_i　< 5 ) ジャンプ　game_item.txt　アイテム格納先探索_繰り返し　(_itempass)　(_i+1)　(_最小数値)
+    臨時全域変数 返り値 = _最小数値
+    
+    スクリプト終了
+}
+
+待機　続行禁止
+//---------------------------------------------------------------
+//item個数の操作　(消去、個数マイナス、個数探索)
+//---------------------------------------------------------------
+//スクリプト　game_item.txt　アイテム消去　0
+//スクリプト　game_item.txt　アイテム消去　"hasami"
+栞　アイテム消去　_itemNoモード
+{
+    
+    
+    スクリプト　game_item.txt　func_itemNoモード内容変換探索　(_itemNoモード)
+    変数　_inventoryNo　= 返り値
+    変数消去　返り値
+    //該当アイテムがそもそも未定義(_inventoryNo <= -1)のときは終了を。
+    もし (_inventoryNo <= -1) スクリプト終了
+    臨時全域変数　inventorypass[{{_inventoryNo}}]　= "undefined"
+    臨時全域変数　inventoryname[{{_inventoryNo}}]　= "undefined"
+    臨時全域変数　inventoryQTE[{{_inventoryNo}}]　= 0
+    アウト　 Btn_inventory{{_inventoryNo}}　100 全画面領域
+    アウト　mojiQTE_inventory{{_inventoryNo}}　100　全画面領域
+    //念のために手持ちも手ぶらにしておく
+    スクリプト　game_item.txt　アイテム持ち解除　_inventoryNo
+    スクリプト終了
+    
+}
+
+
+待機 続行禁止
+
+//スクリプト　game_item.txt　アイテム減少　0
+//スクリプト　game_item.txt　アイテム減少　"hasami"
+//スクリプト　game_item.txt　アイテム個数検索　(_itemNoモード)
+栞　アイテム減少　_itemNoモード _減少個数
+{
+    
+    もし　(_減少個数 == undefined ) 変数　_減少個数　= 1
+    スクリプト　game_item.txt　アイテム個数検索　(_itemNoモード)
+    変数　_inventoryNo　= 返り値_No
+    変数　tempQTE　= 返り値_QTE
+    変数消去2　返り値_.*
+    
+    もし (tempQTE  <= 0) スクリプト終了
+    臨時全域変数　inventoryQTE[{{_inventoryNo}}]　-= (_減少個数)
+    変数　tempQTE = inventoryQTE[{{_inventoryNo}}]
+    文字0 mojiQTE_inventory{{_inventoryNo}} (140 * (_inventoryNo%2)  + 1090 )   (133*(_inventoryNo/2)+160)  (vn_R値_インベントリ +20)  r-mplus-1c-m.ttf 40 "×{{tempQTE}} "
+    もし ( tempQTE >= 2)  イン mojiQTE_inventory{{_inventoryNo}} 10
+    違ったら　透明度　mojiQTE_inventory{{_inventoryNo}}　0 10
+    //個数がゼロになった場合はアイテム消去処理を。
+    もし　(tempQTE  <= 0)　スクリプト　game_item.txt　アイテム消去　(_inventoryNo)
+    スクリプト終了
+}
+
+
+待機 続行禁止
+
+
+    //スクリプト　game_item.txt　アイテム個数検索　0
+    //スクリプト　game_item.txt　アイテム個数検索　"hasami"
+    //スクリプト　game_item.txt　アイテム個数検索　(_itemNoモード)
+    //    変数　_inventoryNo　= 返り値_No
+    //    変数　tempQTE　= 返り値_QTE
+    //    変数消去2　返り値_.*
+    
+    //※"hasami"が存在しないときの挙動 返り値として以下が代入される↓
+    //    変数　_inventoryNo　= -2
+    //    変数　tempQTE　= 0
+
+
+栞　アイテム個数検索　_itemNoモード
+{
+    
+    スクリプト　game_item.txt　func_itemNoモード内容変換探索　(_itemNoモード)
+    変数　_inventoryNo　= 返り値
+    変数消去　返り値
+    臨時全域変数　返り値_No = _inventoryNo
+    
+    もし　(_inventoryNo <= -1) 変数　tempQTE = 0
+    違ったら　変数　tempQTE = inventoryQTE[{{_inventoryNo}}]
+    臨時全域変数　返り値_QTE　= tempQTE
+    スクリプト終了
+}
+
+
+待機 続行禁止
+
+
+
+
+//---------------------------------------------------------------
+栞　アイテム名表示　_inventoryNo
+{
+   変数　a = inventoryname[{{_inventoryNo}}] 
+    文字 NowitemnameA 1210 380 (vn_R値_インベントリ +20)  r-mplus-1c-m.ttf 25 33 横 中央　"アイテム"
+    文字 NowitemnameB 1210 420 (vn_R値_インベントリ +20)  r-mplus-1c-m.ttf 22 33 横 中央　"{{a}}"
+    タッチ終了時　Btn_inventory{{_inventoryNo}}　アウト　Nowitemname.*
+    
+}
+スクリプト終了
+待機 続行禁止
+
+
+
+//---------------------------------------------------------------
+//アイテムinventoryをクリックするとそれをselectedに格納、あるいは解除する栞(select画像移動も)
+//---------------------------------------------------------------
+栞　アイテム持ち替えSorF　_inventoryNo
+{
+    入力禁止　true 
+    もし　( selecting_No != _inventoryNo )  スクリプト　game_item.txt　アイテム持ち替えS　_inventoryNo
+    違ったら  スクリプト　game_item.txt　アイテム持ち解除　_inventoryNo
+    .入力禁止　 false
+    
+}
+
+スクリプト終了
+待機 続行禁止
+//---------------------------------------------------------------
+栞　アイテム持ち替えS　_inventoryNo
+{
+    
+    臨時全域変数　selecting = inventorypass[{{_inventoryNo}}]
+    臨時全域変数　selecting_No = _inventoryNo
+    移動　selected_img　(130 * (_inventoryNo%2)  +820 )   ((_inventoryNo/2)*133 -149)　50
+    .イン　selected_img
+    
+}
+スクリプト終了
+待機 続行禁止
+//---------------------------------------------------------------
+
+//スクリプト　game_item.txt　アイテム持ち解除　_inventoryNo
+栞　アイテム持ち解除　_inventoryNo
+{
+    
+    臨時全域変数　selecting　= "NoHand"
+    臨時全域変数　selecting_No = -1
+    もし　( selected_img != "INVALID")　 透明度　selected_img　0  全画面領域
+    
+}
+スクリプト終了
+待機 続行禁止
+
+
+//---------------------------------------------------------------
+//アイテム_場面転換ボタン　
+//---------------------------------------------------------------
+//---------------------------------------------------------------
+栞　アイテム_場面転換ボタン　_inventoryNo　_itempass
+{
+    
+   入力禁止  true
+    変数　tempA　=  lvPositionCenterX( "ui_msg_itemget_img" )
+    変数　tempB　=  lvPositionCenterX(_inventoryNo)
+    
+    変数　tempX　=　tempB - tempA
+    
+    //はりぼて
+    移動x2　ui_msg_itemget_img　(tempX)　1000
+    移動y　ui_msg_itemget_img　390　1000
+    待機　1000
+    //item_Btn_MIGI_{{NowObj}}_child　本物obj
+    移動y　(_inventoryNo)　390　全画面領域
+    .アウト　ui_msg_itemget_img
+    
+   入力禁止  false
+    
+    スクリプト終了
+}
+待機 続行禁止
+//---------------------------------------------------------------
+//アイテム不適合汎用会話
+//---------------------------------------------------------------
+
+//スクリプト　game_item.txt　アイテム未所持_miko
+栞　アイテム未所持_miko
+{
+    
+    M_宣言文字窓miko吹き出し "00"
+    "(…今は何も\n持ってないにぇ)
+    ~
+    
+    M_宣言文字窓miko妖精助言 570
+    "所持アイテムを\nクリックして\n選択してね\w
+    ~
+     //M_スクリ_クリック待機　false
+    アウト txtfuki_miko.* 300
+    アウト txtfuki_妖精fbk.* 300
+    待機　300
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+
+//スクリプト　game_item.txt　アイテムが必要_miko　"つるはし"
+栞　アイテムが必要_miko　_アイテム名
+{
+    
+    M_宣言文字窓miko吹き出し "00"
+    "(…これは多分\n{{_アイテム名}}が必要にぇ！)
+    ~
+    
+    M_宣言文字窓miko妖精助言 570
+    "所持アイテムを\nクリックして\n選択してね\w
+    ~
+     //M_スクリ_クリック待機　false
+    アウト txtfuki_miko.* 300
+    アウト txtfuki_妖精fbk.* 300
+    待機　300
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+
+//スクリプト　game_item.txt　アイテム不適合_miko
+栞　アイテム不適合_miko
+{
+    
+    M_宣言文字窓miko吹き出し "00"
+    //絵0 txtfuki_item item/item_turuhasi.png 520 110 119
+    絵0 txtfuki_item item/item_{{selecting}}.png 520 110 119
+    拡大　txtfuki_item 20%
+    イン　txtfuki_item　100
+    
+    "(…このアイテムは\n関係ないなぁ…)
+    ~
+    
+    M_宣言文字窓miko妖精助言 570
+    "何か他のアイテムは\n持っているかな？\w
+    ~
+     //M_スクリ_クリック待機　false
+    アウト txtfuki_.* 300
+    待機　300
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+
+///////////////////
+//アイテムトラップ暴発
+///////////////////
+//ゲームオーバー処理は別でやってね。スキップボタン内蔵なのも注意
+
+/* 例
+栞　アイテム暴発処理
+{
+    
+    //画面領域をここでシラフにしておく　スキップボタン対策
+    スクリプト　game_item.txt　アイテムトラップ暴発_miko　0 0
+    .ジャンプ　game_startsetup.txt　ステージ終了メイン  "gameover"　"03"　"金時に見つかった"
+    
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+*/
+//スクリプト　game_item.txt　アイテムトラップ暴発_miko　0 0
+栞　アイテムトラップ暴発_miko　_落下X　_落下Y
+{
+    
+    画面領域開始　sc_itemtrap　原点回帰時解除
+    //スクリプト　/Plugins/lvui/_system/events.txt 　func_会話skipボタン "ALL" "VOID" 2
+    M_宣言文字窓miko吹き出し "00"
+    絵0 anime_item item/item_turuhasi.png 520 110 121
+    
+    絵0 txtfuki_item item/item_{{selecting}}.png 520 110 119
+    拡大　anime_item 20%
+    イン　anime_item　100
+    
+    "(…このアイテムは\n関係な…
+    ~
+    画像　txtfuki_miko_表情　hito/miko_mini04.png
+    文字サイズ　60
+    -"\n\n        あ!!
+    ~
+    
+    待機 1500
+    //絵0 white_top white_full_1280.png 0 0 120 カメラ付着
+    色調　white_top　#696969
+    透明度　 white_top 200 0
+    効果音 objSE　se_kei_tokitome.ogg
+    絵 itemtrap_金時 hito/kintoki_01.png 100 550 121
+    拡大　itemtrap_金時　50%
+    移動y2　itemtrap_金時　-370 300
+    待機 300
+    
+    
+    M_宣言文字窓その他吹き出し true "金時" "金時"　"void"　"#AA00FF" 100 500　130 0
+    文字サイズ　35
+    文字行サイズ　43
+    "PONトラップ!!\n転倒するみこち！\w
+    .<文字サイズ 20>　そして時は動き出す・・・
+    ~
+    待機 1500
+    移動y2　itemtrap_金時　300 150
+    待機 500
+    アウト .*_金時.* 150
+    待機 150
+    アウト　 white_top
+    効果音 objSE　se_kei_tokitome.ogg
+    
+    待機 10
+    
+    画像　txtfuki_miko_表情　hito/miko_mini02.png
+    回転z2　txtfuki_miko_表情　-780 1500
+    回転z2　anime_item　-1080 2000
+    移動2 anime_item (_落下X/2) -350 1000
+    待機　1000
+    移動2 anime_item (_落下X/2) (350 + (_落下Y)) 1000
+    待機　1000
+    
+    透明度　anime_item　0
+    画像　anime_item　effects/eff_bakuha516.png
+    拡大　anime_item 70%
+    移動2 anime_item  50 0
+    イン　anime_item　0
+    効果音　objSE　se_kei_bakuha.ogg
+    M_スクリ_クリック待機　false
+    
+    画面領域終了　sc_itemtrap
+    スクリプト終了
+    
+    
+}
+
+待機 続行禁止
+//---------------------------------------------------------------
+//こよボックス関連(アイテム合成ギミック)
+//---------------------------------------------------------------
+//こよボックスボタンの始めの入力先はここ
+//スクリプト　game_item.txt　こよボックスmain
+栞　こよボックスmain
+{
+   //入力禁止　 true
+     画面領域開始　sc_koyobox　原点回帰時解除
+    アウト　fukidasi_target　50 全画面領域
+    スクリプト /Plugins/lvui/_system/menu.txt
+    絵0 black_top black_full_1280.png 0 -650 75 カメラ付着
+    絵0 black_bot black_full_1280.png 0 650 75 カメラ付着
+    透明度　 black_.* 150 200
+    
+    背景 　ui_koyobox  UI/ui_koyobox.png  0 0 70
+    
+    タッチ素材設定　 UI/ui_Btn_miko01.png 　UI/ui_Btn_miko01.png　 UI/ui_Btn_miko01.png　se_maoudamashii_system13.ogg
+    ボタン0　koyobox_BtnA  300 330 80　透明無視　スクリプト　/Plugins/lvui/_system/events.txt 　func_会話skip処理
+   ボタン文字 koyobox_BtnA r-mplus-1c-m.ttf  70  0  50 "探索に戻る"
+   拡大　koyobox_Btn.*　60%
+    .文字色  koyobox_Btn* #FFFFFF
+     文字陰   koyobox_Btn.* 1  10   #fe4b74 0 0
+     .イン　koyobox_Btn.*　300
+    
+    スクリプト　game_scenario_miko{{now_stage数字}}.txt　こよ条件式
+    
+    
+   
+    待機　続行禁止
+    .アウト .*　100
+     待機　100
+   画面領域終了　sc_koyobox
+   入力禁止　 false
+     スクリプト終了
+}
+
+/*
+//こよ条件式はそれぞれのscenarioスクリプトでつかう
+//
+//例　
+栞　こよ条件式
+{
+   
+   //「素材をひとつも持っていなかった時」の条件式をつくる
+   変数　こよflagA = 0
+   変数　必要素材数 = 4
+   もし ( inventorypass[1] != "Mtetu") 　変数　こよflagA += 1
+   もし ( inventorypass[2] != "Mtetu") 　変数　こよflagA += 1
+   もし ( inventorypass[3] != "Mtetu") 　変数　こよflagA += 1
+   もし ( inventorypass[4] != "Mtetu") 　変数　こよflagA += 1
+   
+   //全部持っていなかったら0になるはず　
+   もし (こよflagA == 0)  スクリプト　game_scenario_miko{{now_stage数字}}.txt　こよ分岐_該当なし
+    もし (こよflagA == 0)　 スクリプト終了
+    
+    //一つでももっていたら残り素材を教えてあげよう
+    スクリプト　game_item.txt  こよアイテム入力　0　"Mtetu"　-20 -30  "40%"
+    スクリプト　game_item.txt  こよアイテム入力　1　"Mtetu"　100 -30 "40%"
+    スクリプト　game_item.txt  こよアイテム入力　2　"Mtetu"　-20 100 "40%"
+    スクリプト　game_item.txt  こよアイテム入力　3　"Mtetu"　100 100 "40%"
+    スクリプト　game_item.txt  こよアイテム入力　4　"hasami"　40 200 "30%"
+    
+    
+    //スクリプト　game_item.txt  こよアイテム出力　"出力アイテムpass"　(こよflagA)　(必要素材数)
+    スクリプト　game_item.txt  こよアイテム出力　"hasami"　(こよflagA)　(必要素材数)
+    
+    スクリプト終了
+}
+待機　続行禁止
+*/
+
+栞　こよ分岐_該当なし
+{
+    
+    .文字0　koyobox_mojiA 270 280 151  r-mplus-1c-m.ttf 40 "現在の手持ちで合成できる"
+    .文字0　koyobox_mojiB 270 340 151  r-mplus-1c-m.ttf 40 "アイテムはありません"
+    .文字陰   koyobox_moji.*  1  5  #fe4b74 0 0
+    親子　ui_koyobox　koyobox_moji.*
+    .イン　koyobox_moji.*　100
+    
+   入力禁止　 false
+    スクリプト終了
+    
+}
+
+
+栞　こよアイテム入力　_koyoNo　_koyopass　_koyoX　_koyoY　_koyoL
+{
+    
+    背景 　ui_koyobox  UI/ui_koyobox.png  0 0 70
+    絵0　koyoitem{{_koyoNo}}　item/item_{{_koyopass}}.png (_koyoX) (_koyoY) 71
+    変数　こよ手持ち　= inventorypass[{{_koyoNo}}]
+    //もし　( inventorypass[{{_koyoNo}}]  != {{_koyopass}}) 　絵0　koyoitem{{_koyoNo}}_false　UI/ui_koyoA.png (_koyoX) (_koyoY)  72
+    もし　( こよ手持ち  != _koyopass ) 　絵0　koyoitem{{_koyoNo}}_false　UI/ui_koyoA.png (_koyoX) (_koyoY)  72
+    
+    
+    
+    //文字　koyobox_mojiE 270 340 151  r-mplus-1c-m.ttf 40 "( {{こよ手持ち}} != {{_koyopass}}) "
+    //文字　koyobox_mojiC 270 440 151  r-mplus-1c-m.ttf 40 "{{_koyoNo}}{{_koyopass}}"
+    拡大　koyoitem{{_koyoNo}}　{{_koyoL}}
+    拡大　koyoitem{{_koyoNo}}_false　25%
+    .イン　koyoitem{{_koyoNo}} 50
+    透明度　koyoitem{{_koyoNo}}_false　150 50
+      変数　こよ手持ち = "Nohand"
+      //もし　(_koyoNo == 3 ) 待機
+    //.文字0　koyobox_mojiA 270 280 151  r-mplus-1c-m.ttf 40 "鉄ブロック×3 =鉄橋"
+    //.文字陰   koyobox_moji.*  1  5  #fe4b74 0 0
+    //親子　ui_koyobox　koyobox_moji.*
+    //.イン　koyobox_moji.*　100
+    スクリプト終了
+    
+}
+待機　続行禁止
+
+
+栞　こよアイテム出力　_koyopass　達成素材数　必要素材数
+{
+   
+     .文字0　 koyoitem_outmojiA 430 280 71  r-mplus-1c-m.ttf 100 "⇒"
+    .文字0　 koyoitem_outmojiB 380 350 71  r-mplus-1c-m.ttf 30 "合成可能"
+    .もし　(達成素材数 < 必要素材数)  文字0 koyoitem_outmojiB 380 350 71  r-mplus-1c-m.ttf 30 "合成不可"
+   //拡大　koyoitem_outmoji.*　50%
+    .文字陰   koyoitem_outmoji.*  1  5  #fe4b74 0 0
+   イン　koyoitem_outmoji.*　100
+   待機　100
+    .もし　(達成素材数 < 必要素材数)  スクリプト終了
+    
+    タッチ素材設定　item/item_{{_koyopass}}.png　item/item_{{_koyopass}}.png　item/item_{{_koyopass}}.png　se_maoudamashii_system13.ogg
+    ボタン0　koyoitem_out 450 50 71 透明無視　スクリプト　game_item.txt　こよアイテムゲットA  (_koyopass)
+    ボタン文字　koyoitem_out r-mplus-1c-m.ttf  70  0  200 "クリックで入手"
+    焦点　koyoitem_out　0.5 0.5
+   拡大　koyoitem_out　40%
+    .文字色  koyoitem_out* #FFFFFF
+     文字陰   koyoitem_out.* 1  10   #fe4b74 0 0
+     .イン　koyoitem_out.*　300
+    
+    //.文字陰   koyobox_moji.*  1  5  #fe4b74 0 0
+    //親子　ui_koyobox　koyobox_moji.*
+    //.イン　koyobox_moji.*　100
+    スクリプト終了
+    
+}
+
+待機　続行禁止
+
+栞　こよアイテムゲットA  _koyopass
+{
+    
+    
+    .アウト .*　100
+     待機　100
+   画面領域終了　sc_koyobox
+   入力禁止　true
+   //↓各スクリプトにで素材消去と合成素材入手処理を書く
+   スクリプト　game_scenario_miko{{now_stage数字}}.txt　こよアイテム入手と素材削除
+   入力禁止　 false
+   スクリプト終了原点回帰
+    
+    
+}
+待機　続行禁止
+/*
+//例
+栞　こよアイテム入手と素材削除
+{
+    //inventory削除
+    スクリプト　game_item.txt　アイテム消去　_inventoryNo
+    スクリプト　game_item.txt　アイテム消去　_inventoryNo
+    スクリプト　game_item.txt　アイテム消去　_inventoryNo
+    //合成item入手
+   スクリプト　game_item.txt　get_item_msg  0 "hasami"　"はさみ"
+    
+    スクリプト終了
+}
+待機　続行禁止
+*/
+    
+    
+
+

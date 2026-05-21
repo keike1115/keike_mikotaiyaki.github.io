@@ -1,0 +1,1184 @@
+//レイヤー　 menu 200~　背景0　
+//文字窓　100
+//白窓,message窓　100
+//地形トラップ　10
+//セリフ　120
+//小物　拾うアイテム、人物　15から
+//ゲームオーバーゲームclear、gameover背景　180
+//
+//すてーじセレクト  300~
+//iteminventory　80
+//バグやること
+//セリフ変更
+//効果音→ボイス
+//会話スキップ直し
+
+ //移動x2　back_horo_MDL　1300
+// 移動x2　back_horo_MDL　-1300
+/*
+
+
+やること
+①南京錠UIのセリフ吹き出し置換とデバック
+②こよボックス」storyボタン２種押した後の処理
+③レシピごとのボタンや画像切り替え
+*/
+
+栞　デバックMaine
+{
+    
+    
+    
+    //------------------------------------------------------
+    //デバッグ用変数←最後には全て消すこと
+    //------------------------------------------------------
+    //ゲームモード設定
+    臨時全域変数 gamemode  = "miko"
+    //臨時全域変数 gamemode  = "suba"
+    .スクリプト　game_startsetup.txt　func_共通レイヤー設定
+    スクリプト　game_item.txt　アイテム初期処理
+    ~スクリプト /Plugins/lvui/_system/macros.txt
+    背景 back_inventory Back/back_inventory.png 0 0 80
+    //------------------------------------------------------
+    
+   
+    //スクリプト　現在　初期場面セット　"背景パス"　            "今"　"今の右のobj"　"今の左の"
+    スクリプト　game_startsetup.txt　初期場面セット　"back_horo_BASE"　"BASE"　"HIDA"　"VOID"
+    スクリプト　game_startsetup.txt　初期場面セット　"back_horo_MIGI"　"MIGI"　"VOID"　"MDL"
+    スクリプト　game_startsetup.txt　初期場面セット　"back_horo_MDL"　"MDL"　"MIGI"　"HIDA"
+    スクリプト　game_startsetup.txt　初期場面セット　"back_horo_HIDA"　"HIDA"　"MDL"　"VOID"
+    .待機　10
+
+      //------------------------
+      
+      
+    移動x　back_BASE　-1300
+    移動x　back_HIDA　1300
+    移動x　back_MDL　1300
+    //移動x　back_MIGI　1300　
+    
+    臨時全域変数 now_stage数字 = 20
+    
+    スクリプト　game_item.txt　get_item_msg  "最小空箱" "hasami"　"はさみ"
+    スクリプト　game_item.txt　get_item_msg  "最小空箱" "hasami"　"はさみ"
+    スクリプト　game_item.txt　get_item_msg  "最小空箱" "hasami"　"はさみ"
+    スクリプト　game_item.txt　get_item_msg  "最小空箱" "ringo"　"ringo"
+    スクリプト　game_item.txt　get_item_msg  "最小空箱" "ringo"　"ringo"
+    スクリプト　game_item.txt　get_item_msg  "最小空箱" "ringo"　"ringo"
+    個体　flag_こよboxレシピ　0 0 0
+    スクリプト　game_gimmick.txt　こよBoxメモ白窓UI開始main　
+    //スクリプト　game_gimmick.txt　南京錠UI開始main　"デバック" "0000"
+    
+    スクリプト終了
+    
+}
+
+待機　続行禁止
+
+栞　南京錠正解後処理_デバック
+{
+    
+    
+    文字 mojimikoA_基礎メモchild 330 200 73  r-mplus-1c-m.ttf 100 "かぎあけ成功"  
+    
+    スクリプト終了
+    
+}
+
+
+待機 続行禁止
+
+
+/*
+    スクリプト game_gimmick.txt　南京錠UI削除
+    画面領域終了　sc_南京錠UI　
+    入力禁止 false
+    スクリプト終了
+*/
+/*
+/////////////////////////
+//デバック用＆白窓作成時のテンプレコード
+/////////////////////////
+
+//スクリプト　game_gimmick.txt 　メモ白窓デフォUI開始mai
+栞　メモ白窓デフォUI開始main　_白窓id
+{
+    
+    入力禁止 true
+    アウト　fukidasi_target.*　50
+    画面領域開始　sc_白窓UI　原点回帰時解除
+    
+    入力禁止 true
+    
+    
+    /////////////////////////
+    //UI画像や文字など
+    /////////////////////////
+    
+    //目的に合わせて書く
+    
+    
+    
+    
+    /////////////////////////
+    //ボタンと跳び処理命令
+    /////////////////////////
+    
+    //目的に合わせて書く
+    
+    /////////////////////////
+    //上記すべて順番にin配置
+    /////////////////////////
+    
+    親子　back_基礎メモ　.*基礎メモchild
+    移動y2　back_基礎メモ　-1000
+    待機　3
+    イン　.*基礎メモchild 0
+    移動y2　back_基礎メモ　1000　500
+    待機　500
+    入力禁止 false
+    
+    /////////////////////////
+    //条件があるまで待機
+    /////////////////////////
+     M_スクリ_クリック待機　false
+    
+    
+    /////////////////////////
+    //修了処理
+    /////////////////////////
+    
+    スクリプト game_gimmick.txt　白窓UI全て削除
+    画面領域終了　sc_白窓UI　
+    入力禁止 false
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+
+/////////////////////////
+//基礎
+/////////////////////////
+
+
+//スクリプト　game_gimmick.txt 　メモ白窓デフォUI開始main "オブジェクトの名前"　"栞名"
+//スクリプト　game_gimmick.txt 　メモ白窓デフォUI開始main "白窓基礎A"　"栞名"
+栞　メモ白窓デフォUI開始main　_白窓id　_栞名 _待機方法
+{
+    
+    入力禁止 true
+    アウト　fukidasi_target.*　50
+    画面領域開始　sc_白窓UI_{{_白窓id}}　原点回帰時解除
+    
+    入力禁止 true
+    
+    
+    /////////////////////////
+    //UI画像や文字など
+    /////////////////////////
+    
+    //目的に合わせて書く
+    スクリプト　game_scenario_miko{{now_stage数字}}.txt
+    
+    
+    
+    /////////////////////////
+    //ボタンと跳び処理命令
+    /////////////////////////
+    
+    //目的に合わせて書く
+    
+    /////////////////////////
+    //上記すべて順番にin配置
+    /////////////////////////
+    
+    親子　back_{{_白窓id}}　.*_{{_白窓id}}child
+    移動y2　back_{{_白窓id}}　-1000
+    待機　3
+    イン　.*_{{_白窓id}}child 0
+    移動y2　back_{{_白窓id}}　1000　500
+    待機　500
+    入力禁止 false
+    
+    /////////////////////////
+    //条件があるまで待機
+    /////////////////////////
+     M_スクリ_クリック待機　false
+    
+    
+    /////////////////////////
+    //修了処理
+    /////////////////////////
+    
+    スクリプト game_gimmick.txt　白窓UI全て削除
+    画面領域終了　sc_白窓UI_{{_白窓id}}
+    入力禁止 false
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+*/
+//------------------------------------------------------
+//UI共通処理
+//------------------------------------------------------
+/////////////////////////
+//
+/////////////////////////
+
+//やること　背景移動拡大によるカメラ座標合わせ　ギミックon/offボタン移動
+//スクリプト　game_gimmick.txt ギミック場面開始　"_backpass"　_CameX  _CameY "_CameL"　false　true
+栞　 ギミック場面拡大開始　_backpass　_CameX 　_CameY　_CameL _exitBtn有無 _入力禁止可否
+{
+    
+    
+    入力禁止　true
+    アウト　fukidasi_target　50
+    //拡大2 back_{{_backpass}}　{{_CameL}}　300 全画面領域
+    //↑レイヤーも巻き添え拡大してしまうのでｘｙを分ける
+    拡大x2　back_{{_backpass}}　{{_CameL}}　300 全画面領域
+    拡大y2　back_{{_backpass}}　{{_CameL}}　300 全画面領域
+    移動2　back_{{_backpass}}　(_CameX)　(_CameY) 300 全画面領域
+    
+    タッチ素材設定  UI/ui_Btn_MIGI01.png　UI/ui_Btn_MIGI02.png　UI/ui_Btn_MIGI02.png se_maoudamashii_onepoint26.ogg se_maoudamashii_onepoint30.ogg
+    ボタン0　ui_Btn_GimCancel　-150 450 79　透明無視　スクリプト game_startsetup.txt ギミック場面解除　(_backpass)
+    
+    拡大　ui_Btn_GimCancel　50%
+    回転　ui_Btn_GimCancel　90
+    
+    透明度　ui_Btn_.* 0 100 全画面領域
+    
+    もし (_exitBtn有無 == true) イン　ui_Btn_GimCancel　50
+    もし (_exitBtn有無 == false) アウト　ui_Btn_GimCancel
+    
+    
+    待機　300
+    もし　( _入力禁止可否 == false ) 入力禁止　false
+    スクリプト終了
+   　
+}
+
+待機　続行禁止
+//スクリプト　game_gimmick.txt ギミック場面拡大解除　"HIDA"
+栞　 ギミック場面拡大解除　_backpass  _入力禁止可否
+{
+    
+    入力禁止　true
+    アウト　ui_Btn_GimCancel.*
+    イン　ui_Btn_.* 300 全画面領域
+    拡大　back_{{_backpass}}　100%　300 全画面領域
+    移動　back_{{_backpass}}　0 0 300 全画面領域
+    
+    待機　300
+    もし　( _入力禁止可否 == false ) 入力禁止　false
+    スクリプト終了
+}
+
+待機　続行禁止
+
+//スクリプト　game_gimmick.txt 白窓共通エントリー　"タイトル"
+栞　白窓共通エントリー　_文字
+{
+    
+    個体　back_基礎メモ　0 0 0
+    絵0 白窓A_基礎メモchild　story/story_memodef.png　210 170 70 
+    拡大　白窓A_基礎メモchild 170%
+    
+    絵0 白窓B_基礎メモchild　story/story_memodef.png　300 -100 71
+    拡大　白窓B_基礎メモchild 100% 35%
+    
+    文字0 moji白窓_基礎メモchild 340 50 73  r-mplus-1c-m.ttf 35 "{{_文字}}" 
+    
+    親子　back_基礎メモ　.*基礎メモchild
+    透明度　ui_Btn_.* 0 100 全画面領域
+    スクリプト終了
+    
+}
+
+
+待機 続行禁止
+//スクリプト　game_gimmick.txt 白窓順番配置
+栞　白窓順番配置
+{
+    
+    
+    親子　back_基礎メモ　.*基礎メモchild
+    移動y2　back_基礎メモ　-1000
+    待機　3
+    イン　.*基礎メモchild 0
+    移動y2　back_基礎メモ　1000　500
+    待機　500
+    スクリプト終了
+    
+}
+
+
+待機 続行禁止
+
+絵 mikoA_基礎メモchild　hito/miko_mini00.png　100 0 72
+拡大　mikoA_基礎メモchild　60%
+//スクリプト game_gimmick.txt　共通UI_探索に戻る "南京錠"
+栞　共通UI_探索に戻る　_待機id
+{
+    
+    入力禁止 true
+    アウト　mojimiko.*　100
+    アウト　story_Btn.*　100
+    移動x2 mikoA_基礎メモchild 350 10000
+    回転y　mikoA_基礎メモchild　90 300
+    
+    使用文字窓　txtfuki_みこ_基礎メモchild
+    "
+    ~
+    透明度 txtfuki_みこ_基礎メモchild　255 100
+    待機 300
+    画像　mikoA_基礎メモchild　hito/miko_mini03.png
+    回転y　mikoA_基礎メモchild　180　300
+      
+    
+    入力禁止 false
+    "もう少し探索して出直すにぇ…\w
+    ~
+    アウト flag_{{_待機id}}待機
+    スクリプト終了
+}
+
+待機 続行禁止
+/////////////////////////
+//修了処理
+/////////////////////////
+栞　関係UI全て削除
+{
+    
+    
+    親子　back_基礎メモ　.*基礎メモchild.*
+    移動y2　back_基礎メモ -1000　1000
+    透明度　ui_Btn_.* 225 300 全画面領域
+    
+    システムエラ　""
+    待機　1000
+    アウト　story_Btn.* 全画面領域
+    アウト　back_基礎メモ　100 
+    待機　120
+    イン　ui_Btn_.* 300 全画面領域
+    待機　300
+    
+    スクリプト終了
+    
+}
+
+
+待機 続行禁止
+
+
+
+//------------------------------------------------------
+//こよBoxmain
+//------------------------------------------------------
+
+/*
+memo
+レシピ切り替えでリセットするもの
+アイテム画像など
+    アウト　こよ要求.*
+    
+    スロット変数値各種
+    変数消去2　こよリスト.*
+
+*/
+
+個体　flag_こよboxレシピ　0 0 0
+//スクリプト　game_gimmick.txt　こよBoxメモ白窓UI開始main　
+栞　こよBoxメモ白窓UI開始main　
+{
+    
+    入力禁止 true
+    アウト　fukidasi_target.*　50
+    画面領域開始　sc_白窓UI_こよBox　原点回帰時解除
+    
+    入力禁止 true
+    
+    スクリプト　game_gimmick.txt 白窓共通エントリー　"　   　こよりbox"
+    
+    
+    
+    /////////////////////////
+    //フラグ
+    
+    個体　flag_こよbox待機　0 0 0
+    
+    /////////////////////////
+    //UI画像や文字など
+    /////////////////////////
+    
+    絵0 mikoA_基礎メモchild　hito/miko_mini00.png　500 0 72
+    拡大　mikoA_基礎メモchild　60%
+    //絵0 mikoA_基礎メモchild　hito/ANI_act_mikosenaka01.png　200 50 72
+    //拡大　mikoA_基礎メモchild 50%
+    
+    
+    //文字0 mojimikoB_基礎メモchild 730 300 73  r-mplus-1c-m.ttf 50 "？?"  
+    //文字陰  mojimiko.* 1  5   #fe4b74 0 0
+    //回転　mojimikoB_基礎メモchild　-45
+    
+    絵0 こよBox画像A_基礎メモchild　komono/kagu_koyobox.png　120 -220 71
+    絵0 こよBox画像B_基礎メモchild　komono/kagu_koyobox.png　350 200 81
+    拡大　こよBox画像A_基礎メモchild　25%
+    拡大　こよBox画像B_基礎メモchild　50%
+    
+    
+    絵0 こよBox_色背景_基礎メモchild white_full_1280.png -250 50 71 カメラ付着
+    色調　こよBox_色背景_基礎メモchild　#936cc6
+    拡大　こよBox_色背景_基礎メモchild 55% 50%
+    
+    ~ タッチ素材設定　white_full_1280.png white_full_1280.png white_full_1280.png se_maoudamashii_onepoint26.ogg se_maoudamashii_onepoint30.ogg
+    ボタン0 こよBox_レシピボタン0_基礎メモchild -500 -170 71 カメラ付着
+    色調　こよBox_レシピボタン0_基礎メモchild　#936cc6
+    
+    ボタン0 こよBox_レシピボタン1_基礎メモchild -300 -170 71 カメラ付着
+    色調　こよBox_レシピボタン1_基礎メモchild #831550
+    
+    ボタン0 こよBox_レシピボタン2_基礎メモchild -100 -170 71 カメラ付着
+    色調　こよBox_レシピボタン2_基礎メモchild　#93dcd8
+    
+    拡大　こよBox_レシピボタン.* 15% 10%
+    文字0 こよBox_レシピ文字0_基礎メモchild 70 175 73  r-mplus-1c-m.ttf 35　"レシピ①"
+    文字0 こよBox_レシピ文字1_基礎メモchild 270 175 73  r-mplus-1c-m.ttf 35　"レシピ②"
+    文字0 こよBox_レシピ文字2_基礎メモchild 470 175 73  r-mplus-1c-m.ttf 35　"レシピ③"
+    
+    親子　back_基礎メモ　.*基礎メモchild
+    
+    
+    
+    //合成可能ボタン配置
+    //story_Btn →押されたらすぐにアウトで削除
+    ~ タッチ素材設定　 UI/ui_Btn_miko01.png 　UI/ui_Btn_miko01.png　 UI/ui_Btn_miko02.png
+    ボタン0　story_Btn1_終端メモchild  400 350 200　透明無視　スクリプト　game_gimmick.txt こよbox合成アニメ_main
+    ボタン文字 story_Btn1_終端メモchild r-mplus-1c-m.ttf  90  0  45 "組み立て開始"
+    反応透明度 story_Btn1.* 251
+    
+    
+    ~ タッチ素材設定　 UI/ui_Btn_miko01.png 　UI/ui_Btn_miko01.png　 UI/ui_Btn_miko02.png
+    ボタン0　story_Btn2_終端メモchild 650 350 200　透明無視　スクリプト game_gimmick.txt　共通UI_探索に戻る "こよbox"
+    ボタン文字 story_Btn2_終端メモchild r-mplus-1c-m.ttf  80  0  15 "もう少し"
+    ボタン文字 story_Btn2_終端メモchild r-mplus-1c-m.ttf  80  0  75 "探索するにぇ"
+    
+    .文字色  story_Btn* #FFFFFF
+     文字陰   story_Btn.* 1  10   #fe4b74 0 0
+    拡大　story_Btn.* 50%
+    透明度　story_Btn.* 0 100 全画面領域
+    
+    /////////////////////////
+    //ボタンと跳び処理命令
+    /////////////////////////
+    
+    //----------------
+    //アイテム素材条件探索(シナリオ側処理)
+    //----------------
+    スクリプト　game_scenario_miko{{now_stage数字}}.txt　こよBoxシナリオ側状態判別処理main_0
+    
+//臨時全域変数　返り値_こよbox状態 = "レシピ無し"
+//臨時全域変数　返り値_こよbox状態 = "素材不足"
+//臨時全域変数　返り値_こよbox状態 = "合成可能"
+    変数　こよアイテム合成可否　= 返り値_こよbox状態
+    変数消去　返り値_こよbox状態
+    //画像配置
+    
+    //もし　( こよアイテム合成可否　=　"合成可能")　スクリプト　game_gimmick.txt　こよbox要求条件別UI配置_合成可能
+    
+    
+    
+    /////////////////////////
+    //上記すべて順番にin配置
+    /////////////////////////
+    スクリプト　game_gimmick.txt 白窓順番配置
+    イン　mojimikoA　700
+    待機　1000
+    
+    
+    //条件に合わせたUI「こよ要求.*」の配置(表示はしない)
+    もし　( こよアイテム合成可否　!=　"レシピ無し") M_スクリ_反復実行改　0 (こよbox_要求種類-1)　"game_gimmick"　"こよbox要求アイテムUI配置"
+    もし　( こよアイテム合成可否　==　"レシピ無し")　スクリプト　game_gimmick.txt　こよbox要求条件別UI配置_レシピ無し
+    もし　( こよアイテム合成可否　==　"素材不足")　スクリプト　game_gimmick.txt　こよbox要求条件別UI配置_素材不足
+    
+    待機　300
+    イン　こよ要求.* 300
+    待機　300
+    
+    //みこセリフと表情設定
+    変数　白窓みこ文字中身　= "レシピを探す\n必要があるかも"
+    M_宣言文字窓その他吹き出し false "みこ_基礎メモchild" "みこ"　"void"　"#fe4b74" 700 160 100 60
+    移動2　txtfuki_みこ_基礎メモchild_skin　-20 -20
+    拡大　txtfuki_みこ_基礎メモchild_skin　35% 40% 100
+    イン txtfuki_みこ_基礎メモchild 300
+    待機　300
+    
+    
+    ~文字サイズ　20
+    文字行サイズ  28
+    "{{白窓みこ文字中身}}
+    ~
+    
+    
+    
+    イン　story_Btn2.*　700
+    もし　( こよアイテム合成可否　==　"合成可能")　イン　story_Btn1.* 700
+    
+    待機　700
+    
+    
+    入力禁止 false
+    
+    
+    /////////////////////////
+    //条件があるまで待機
+    /////////////////////////
+    待機　個体消滅 flag_こよbox待機
+    
+    
+    /////////////////////////
+    //修了処理&正解時処理受け渡し
+    /////////////////////////
+    画面領域終了　sc_白窓UI_こよBox
+    もし　(lvExistsObj("flag_南京錠正解時削除") == false) スクリプト　game_scenario_miko{{now_stage数字}}.txt　南京錠正解後処理_{{keyNowID}}
+    画面領域開始　sc_白窓UI_こよBox　原点回帰時解除
+    
+    
+    
+    スクリプト game_gimmick.txt　関係UI全て削除
+    画面領域終了　sc_白窓UI_こよBox
+    
+    //正解時処理
+    //もし　(lvExistsObj("flag_南京錠正解時削除") == false) スクリプト　game_scenario_miko{{now_stage数字}}.txt　南京錠正解後処理_{{keyNowID}}
+    //もし　(lvExistsObj("flag_南京錠正解時削除") == false) スクリプト　game_gimmick.txt　南京錠正解後処理_{{keyNowID}}
+    //アウト　flag_南京錠正解時削除.*　全画面領域
+    
+    入力禁止 false
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+
+    画面領域開始　sc_白窓UI_こよBox　原点回帰時解除
+栞　こよbox合成アニメ_main　
+{
+    変数　_こよid = 0 
+    変数 _itempass　= こよリスト_itempass[_こよid]
+    
+    
+    画面領域終了　sc_白窓UI_こよBox
+    入力禁止 true
+    M_スクリ_反復実行改　0 (こよbox_要求種類-1)　"game_gimmick"　"こよbox合成アニメ_A"
+    画面領域開始　sc_白窓UI_こよBox　原点回帰時解除
+    
+    アウト　こよ要求文字.* 300
+    待機　300
+    
+    
+    臨時全域変数 こよ完成_itempass = "tetuhasi"
+    臨時全域変数 こよ完成_itemname = "鉄橋"
+    画像 こよ要求0_アイテム絵_基礎メモchild　item/item_{{こよ完成_itempass}}.png
+    移動　こよ要求0_アイテム絵_基礎メモchild 100 100  300
+    .拡大　こよ要求0_アイテム絵_基礎メモchild　60% 300
+    効果音　SE se_kei_syakin01.ogg
+    待機　300
+    
+    
+    画面領域終了　sc_白窓UI_こよBox
+    スクリプト　game_item.txt　get_item_msg  "最小空箱" (こよ完成_itempass)　(こよ完成_itemname)
+    画面領域開始　sc_白窓UI_こよBox　原点回帰時解除
+    入力禁止 true
+    アウト　flag_こよbox待機　全画面領域
+    
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+栞　こよbox合成アニメ_A　_こよid　
+{
+    
+    移動　こよ要求{{_こよid}}_アイテム絵_基礎メモchild 400 250 300 全画面領域
+    効果音　SE　se_maoudamashii_system27.ogg
+    
+    もし　(こよ_表示モード == "一つずつ") 変数 _消去個数　= 1
+    もし　(こよ_表示モード == "種類ごと") 変数 _消去個数　= こよリスト_要求個数[_こよid]
+    変数 _itemname　= こよリスト_itemname[_こよid]
+    スクリプト　game_item.txt　アイテム減少　(_itempass) _消去個数
+    待機　300
+    
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+    
+
+//----------------
+//アイテムUIの配置
+//----------------
+
+
+
+栞　こよbox要求条件別UI配置_レシピ無し
+{
+    
+    文字0 こよ要求_レシピ無し_基礎メモchild 200 350 81  r-mplus-1c-m.ttf 70 "レシピ不明" 
+    文字色  こよ要求_レシピ無し_基礎メモchild 1  5   150 180 250 0 0
+    文字陰  こよ要求_レシピ無し_基礎メモchild 1  5   #FFFFFF 0 0
+    絵0　こよ要求_レシピ無し絵_基礎メモchild　hito/koyori03.png　0 120 81
+    拡大　こよ要求_レシピ無し絵_基礎メモchild　30%
+    
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+栞　こよbox要求条件別配置_素材不足
+{
+    
+    
+    臨時全域変数　文字中身　= "レシピを探す\n必要があるかも"
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+    
+栞　こよbox要求条件別配置_合成可能
+{
+    
+    
+    
+    臨時全域変数　文字中身　= "レシピを探す\n必要があるかも"
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+
+栞　こよbox要求アイテムUI配置　_こよid　
+{
+    
+    変数　間隔横　= (_こよid/2) * 230
+    変数　間隔縦 = (_こよid%2) * 170
+    
+    変数 _itempass　= こよリスト_itempass[_こよid]
+    変数 _itemname　= こよリスト_itemname[_こよid]
+    変数 _要求個数　= こよリスト_要求個数[_こよid]
+    変数 _現在個数　= こよリスト_現在個数[_こよid]
+    //不足時 false 足りるときtrue
+    変数　_個数条件可否　=　(_現在個数 >= _要求個数)
+    
+    
+    もし　((こよ_表示モード == "一つずつ") && (_個数条件可否 == true )) 変数 _現在個数 = 1
+    もし　((こよ_表示モード == "一つずつ") && (_個数条件可否 == false )) 変数 _現在個数 = 0
+    もし　(こよ_表示モード == "一つずつ") 変数 _要求個数　= 1
+
+    
+    絵0 こよ要求{{_こよid}}_アイテム絵_基礎メモchild　item/item_{{_itempass}}.png (間隔横-170 ) (間隔縦+ 50) 75 
+    拡大　こよ要求{{_こよid}}_アイテム絵_基礎メモchild　20% 
+    文字0　こよ要求文字名{{_こよid}}_基礎メモchild ( 間隔横 + 50 ) (間隔縦 + 370)  76　r-mplus-1c-m.ttf 30 "{{_itemname}}"
+    文字0　こよ要求文字要{{_こよid}}_基礎メモchild ( 間隔横 + 150 ) (間隔縦 + 280)  77　r-mplus-1c-m.ttf 30 30 "現\n×{{_現在個数}} /要\n   / ×{{_要求個数}}\n"
+    //足りないときは赤く
+    もし (! _個数条件可否 )　文字色　こよ要求文字要{{_こよid}}_基礎メモchild #ec5353
+    
+    スクリプト終了
+    
+}
+
+
+//スクリプト　game_gimmick.txt こよアイテム素材条件判別　こよid　_itempass　_itemname　_要求個数　
+栞　こよアイテム素材個数判別　こよid　_itempass　_itemname　_要求個数　
+{
+    
+    
+    
+    
+    //////////////
+    //探索条件式フラグ
+    //////////////
+    //※"hasami"が存在しないときの挙動 返り値として以下が代入される↓
+    //    変数　_inventoryNo　= -2
+    //    変数　tempQTE　= 0
+    スクリプト　game_item.txt　アイテム個数検索　"{{_itempass}}"
+    変数　_inventoryNo　= 返り値_No
+    変数　tempQTE　= 返り値_QTE
+    変数消去2　返り値_.*
+    
+    //足りるときはフラグを立てる
+    もし (_要求個数 <=　tempQTE )　臨時全域変数　こよbox_現在種類　+= +1
+    
+    
+    //////////////
+    //配列記憶処理
+    //////////////
+    
+    臨時全域変数 こよリスト_itempass　= lvListPushBack(こよリスト_itempass, _itempass)
+    臨時全域変数 こよリスト_itemname = lvListPushBack(こよリスト_itemname, _itemname)
+    臨時全域変数 こよリスト_要求個数 = lvListPushBack(こよリスト_要求個数, _要求個数)
+    臨時全域変数 こよリスト_現在個数 = lvListPushBack(こよリスト_現在個数, tempQTE)
+    
+    
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+    
+
+
+
+
+
+//------------------------------------------------------
+//ドラムUI関数汎用
+//------------------------------------------------------
+/*
+呼び出し側使用例
+
+
+    //配列をまずセットする
+   臨時全域変数 ヒント難易度　= lvCreateVarList(3)
+   臨時全域変数 ヒント難易度[0] = "毎回削除"
+   臨時全域変数 ヒント難易度[1] = "ステージ移動時に削除"
+   臨時全域変数 ヒント難易度[2] = "新ヒント取得時に通知"
+   スクリプト game_gimmick.txt　func_ドラム生成 "ヒント設定A" 0 "ヒント難易度" 2　"横" -100 200 300 0 250 "config-system"　"ヒント保存"
+   イン　Drumヒント設定A.*
+   拡大　Drumヒント設定A_Btn.* 30%
+
+
+*/
+//スクリプト geme_gimmick.txt　func_ドラム生成 "ヒント設定A" 0 "ヒント難易度" 2　"横" -100 200 300 0 250 "config-system"　"ヒント保存"
+栞 func_ドラム生成 _id _default _array _max　_向き _L位置 _文字位置A _R位置 _共通位置 _文字位置B _栞pass　_栞タイトル
+{
+    
+    もし ( drum == undefined) 臨時全域変数 drum = lvCreateVarHashMap()
+    臨時全域変数　drum[_id] = lvCreateVarHashMap()
+
+    臨時全域変数　drum[_id]["value"] = _default
+    臨時全域変数　drum[_id]["max"] = _max
+    臨時全域変数　drum[_id]["array"] = _array
+    臨時全域変数　drum[_id]["栞pass"] = _栞pass
+    臨時全域変数　drum[_id]["栞タイトル"] = _栞タイトル
+    臨時全域変数　drum[_id]["向き"] = _向き
+    
+    
+    もし (_向き == "横") 変数 _個別軸 = "x" 
+    もし (_向き == "横") 変数 _共通軸 = "y" 
+    もし (_向き == "縦") 変数 _個別軸 = "y" 
+    もし (_向き == "縦") 変数 _共通軸 = "x" 
+    //意味：[ 個別軸 , 共通軸 ] // R 
+    変数 DrumR{{_個別軸}} = _R位置
+    変数 DrumR{{_共通軸}} = _共通位置 
+    // L 
+    変数 DrumL{{_個別軸}} = _L位置 
+    変数 DrumL{{_共通軸}} = _共通位置 
+    // 文字 
+    変数 Drum文字{{_個別軸}} = _文字位置A
+    変数 Drum文字{{_共通軸}} = _文字位置B
+    
+    臨時全域変数　drum[_id]["文字x"] = Drum文字x
+    臨時全域変数　drum[_id]["文字y"] = Drum文字y
+    
+    
+    
+    
+    // 初期表示
+    変数 temp = {{_array}}[(_default)]
+    文字0 Drum{{_id}}_Text (drum[_id]["文字x"]) (drum[_id]["文字y"]) (vn_R値_コンフ+ 2) r-mplus-1c-m.ttf　30 {{_向き}} 中央 "{{temp}}"
+    // 右ボタン
+    タッチ素材設定 UI/ui_Btn_MIGI01.png UI/ui_Btn_MIGI02.png UI/ui_Btn_MIGI02.png
+    ボタン0 Drum{{_id}}_BtnR (DrumRx) (DrumRy) (vn_R値_コンフ+ 2) 透明無視 スクリプト game_gimmick.txt func_ドラム回転 (_id) 1
+
+    // 左ボタン
+    タッチ素材設定 UI/ui_Btn_HIDARI01.png UI/ui_Btn_HIDARI02.png UI/ui_Btn_HIDARI02.png
+    ボタン0 Drum{{_id}}_BtnL (DrumLx) (DrumLy) (vn_R値_コンフ+ 2) 透明無視 スクリプト game_gimmick.txt func_ドラム回転 (_id) -1
+    もし　( drum[_id]["向き"] == "縦")　回転z　Drum{{_id}}_Btn.* 90
+    スクリプト終了
+}
+栞 func_ドラム回転 _id _dir
+{
+    
+    入力禁止 true
+    
+    臨時全域変数 drum[_id]["value"] += _dir
+    
+    // wrap
+    もし (drum[_id]["value"] > drum[_id]["max"])　臨時全域変数　 drum[_id]["value"] = 0
+    もし (drum[_id]["value"] < 0)　臨時全域変数　 drum[_id]["value"] = drum[_id]["max"]
+    
+    もし　(drum[_id]["向き"] == "横")　移動x2　Drum{{_id}}_Text　(-60 *(_dir)) 100
+    もし　(drum[_id]["向き"] == "縦")　移動y2　Drum{{_id}}_Text　(-60 *(_dir)) 100
+    透明度　Drum{{_id}}_Text　0 100
+    待機　100
+    // 表示更新
+    変数 tempA = drum[_id]["array"]
+    変数 tempB = drum[_id]["value"]
+    変数 tempC = {{tempA}}[tempB]
+    
+    
+    文字0 Drum{{_id}}_Text (drum[_id]["文字x"]) (drum[_id]["文字y"]) (vn_R値_コンフ+ 2) r-mplus-1c-m.ttf 30　{{drum[_id]["向き"]}} 中央 "{{tempC}}"
+    
+    もし　(drum[_id]["向き"] == "横")　移動x2　Drum{{_id}}_Text　(60 *(_dir)) 
+    もし　(drum[_id]["向き"] == "縦")　移動y2　Drum{{_id}}_Text　(60 *(_dir)) 
+    待機　3
+    
+    もし　(drum[_id]["向き"] == "横")　移動x2　Drum{{_id}}_Text　(-60 *(_dir)) 100
+    もし　(drum[_id]["向き"] == "縦")　移動y2　Drum{{_id}}_Text　(-60 *(_dir)) 100
+    イン　Drum{{_id}}_Text 150
+    // データ保存や内部処理など
+    待機 150
+    入力禁止 false
+    もし (drum[_id]["_栞pass"] != "") ジャンプ {{drum[_id]["栞pass"]}}.txt {{drum[_id]["栞タイトル"]}} (_id)
+    
+    
+    スクリプト終了
+}
+//------------------------------------------------------
+//南京錠main
+//------------------------------------------------------
+
+//栞　南京錠正解後処理_デバック
+//↑正解時ジャンプ先を元スクリプトに予め書いておく
+
+//スクリプト　game_gimmick.txt　南京錠UI開始main　"key名称id" "正解番号"
+//例
+//スクリプト　game_gimmick.txt　南京錠UI開始main　"控室宝箱A" "0012"
+
+栞　南京錠UI開始main　_KeyIDname　_keyNo
+{
+    
+    入力禁止 true
+    アウト　fukidasi_target　50
+    画面領域開始　sc_南京錠UI　原点回帰時解除
+    
+    入力禁止 true
+    
+    臨時全域変数　keypass_{{_KeyIDname}} = (_keyNo)
+    臨時全域変数　keyNowID = (_KeyIDname)
+    
+    個体　back_基礎メモ　0 0 0
+    個体　flag_南京錠待機　0 0 0
+    個体　flag_南京錠正解時削除　0 0 0
+    
+    /////////////////////////
+    //UI画像や文字など
+    /////////////////////////
+    
+    絵0 金時Nokey_基礎メモchild　komono/komono_Nokey01.png　-50 50 71
+    スクリプト　game_gimmick.txt 白窓共通エントリー　"南京錠「{{keyNowID}}」"
+    親子　back_基礎メモ　.*基礎メモchild
+    透明度　ui_Btn_.* 0 100 全画面領域
+    
+    絵0 mikoA_基礎メモchild　hito/miko_mini00.png　100 0 72
+    拡大　mikoA_基礎メモchild　60%
+    //絵0 mikoA_基礎メモchild　hito/ANI_act_mikosenaka01.png　200 50 72
+    //拡大　mikoA_基礎メモchild 50%
+    
+    
+    文字0 mojimikoB_基礎メモchild 340 300 101  r-mplus-1c-m.ttf 50 "？?"
+    変数　文字中身　= "正解の番号は\nなんだろう・・・？" 
+    文字陰  mojimiko.* 1  5   #fe4b74 0 0
+    回転　mojimikoB_基礎メモchild　-45
+    
+    
+    /////////////////////////
+    //ボタンと跳び処理命令
+    /////////////////////////
+    
+    スクリプト　game_gimmick.txt　南京錠ダイヤルセットアップ 1
+    スクリプト　game_gimmick.txt　南京錠ダイヤルセットアップ 2
+    スクリプト　game_gimmick.txt　南京錠ダイヤルセットアップ 3
+    スクリプト　game_gimmick.txt　南京錠ダイヤルセットアップ 4
+    拡大　keyBtn.* 20%
+    
+    ~ タッチ素材設定　 UI/ui_Btn_miko01.png 　UI/ui_Btn_miko01.png　 UI/ui_Btn_miko02.png
+    ボタン0　story_Btn1_終端メモchild  -20 0 200　透明無視　スクリプト　game_gimmick.txt 南京錠正誤判定A
+    ボタン文字 story_Btn1_終端メモchild r-mplus-1c-m.ttf  80  0  15 "わがった！！"
+    ボタン文字 story_Btn1_終端メモchild r-mplus-1c-m.ttf  80  0  75 "(番号決定)"
+    
+    ~ タッチ素材設定　 UI/ui_Btn_miko01.png 　UI/ui_Btn_miko01.png　 UI/ui_Btn_miko02.png
+    ボタン0　story_Btn2_終端メモchild  650 350 200　透明無視　スクリプト game_gimmick.txt　共通UI_探索に戻る "南京錠"
+    ボタン文字 story_Btn2_終端メモchild r-mplus-1c-m.ttf  70  0  15 "わがんない…"
+    ボタン文字 story_Btn2_終端メモchild r-mplus-1c-m.ttf  70  0  75 "(探索に戻る)"
+    .文字色  story_Btn* #FFFFFF
+     文字陰   story_Btn.* 1  10   #fe4b74 0 0
+    拡大　story_Btn.* 60%
+    
+    
+    /////////////////////////
+    //上記すべて順番にin配置
+    /////////////////////////
+    スクリプト　game_gimmick.txt 白窓順番配置
+    
+    
+    
+    //みこセリフと表情設定
+    M_宣言文字窓その他吹き出し false "みこ_基礎メモchild" "みこ"　"void"　"#fe4b74" 330 200 100 60
+    移動2　txtfuki_みこ_基礎メモchild_skin　-25 -40
+    拡大　txtfuki_みこ_基礎メモchild_skin　30% 32%
+    移動2 txtfuki_みこ_基礎メモchild_name 10 -10
+    文字サイズ  20
+    文字サイズ  20
+    文字行サイズ  25
+    イン txtfuki_みこ_基礎メモchild 300
+    待機　300
+    "正解の番号は\nなんだろう…
+    ~
+    待機　1000
+    
+    
+    イン　story_Btn.*　700
+    入力禁止 false
+    
+    /////////////////////////
+    //条件があるまで待機
+    /////////////////////////
+    待機　個体消滅 flag_南京錠待機
+    
+    
+    /////////////////////////
+    //修了処理&正解時処理受け渡し
+    /////////////////////////
+    スクリプト game_gimmick.txt　関係UI全て削除
+    画面領域終了　sc_南京錠UI　
+    //正解時処理
+    もし　(lvExistsObj("flag_南京錠正解時削除") == false) スクリプト　game_scenario_miko{{now_stage数字}}.txt　南京錠正解後処理_{{keyNowID}}
+    アウト　flag_南京錠正解時削除.*　全画面領域
+    
+    入力禁止 false
+    スクリプト終了
+}
+
+
+待機 続行禁止
+
+//------------------------------------------------------
+//ボタンセット
+//------------------------------------------------------
+
+
+
+栞　南京錠ダイヤルセットアップ _keyケタ番号
+{
+    
+    臨時全域変数 keyinput{{_keyケタ番号}}_{{keyNowID}} = 0
+    文字0　Keymoji0{{_keyケタ番号}}_基礎メモchild 240 (220 + ((_keyケタ番号) * 80)) 73  r-mplus-1c-m.ttf  30  "{{0}}" 
+    タッチ素材設定  UI/ui_Btn_MIGI01.png　UI/ui_Btn_MIGI02.png　UI/ui_Btn_MIGI02.png se_maoudamashii_onepoint26.ogg se_kei_kagi01.ogg
+    ボタン0　keyBtn0{{_keyケタ番号}}_MIGI_基礎メモchild　40  (((_keyケタ番号) * 80) - 50 ) 72　透明無視　スクリプト game_gimmick.txt KeyUpNo (_keyケタ番号)　1
+    
+    タッチ素材設定  UI/ui_Btn_HIDARI01.png　UI/ui_Btn_HIDARI02.png　UI/ui_Btn_HIDARI02.png se_maoudamashii_onepoint26.ogg se_kei_kagi01.ogg
+    ボタン0　keyBtn0{{_keyケタ番号}}_HIDA_基礎メモchild　-50  (((_keyケタ番号) * 80) - 50 ) 72　透明無視　スクリプト game_gimmick.txt KeyUpNo (_keyケタ番号) -1
+    
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+栞　KeyUpNo _keyケタ番号 _向き
+{
+    
+    入力禁止 true
+    臨時全域変数 keyinput{{_keyケタ番号}}_{{keyNowID}}　+= (1 *(_向き))
+    もし　( keyinput{{_keyケタ番号}}_{{keyNowID}} >= 10) 臨時全域変数 keyinput{{_keyケタ番号}}_{{keyNowID}}　= 0
+    もし　( keyinput{{_keyケタ番号}}_{{keyNowID}} <= -1) 臨時全域変数 keyinput{{_keyケタ番号}}_{{keyNowID}}　= 9
+    移動x2　Keymoji0{{_keyケタ番号}}_基礎メモchild　(-40 *(_向き)) 100
+    透明度　Keymoji0{{_keyケタ番号}}_基礎メモchild　0 100
+    待機　100
+    変数　temp_a = keyinput{{_keyケタ番号}}_{{keyNowID}}
+    文字0　Keymoji0{{_keyケタ番号}}_基礎メモchild 240 (220 + ((_keyケタ番号) * 80)) 73  r-mplus-1c-m.ttf  30  "{{temp_a}}" 
+    
+    移動x2　Keymoji0{{_keyケタ番号}}_基礎メモchild　( 80 *(_向き)) 0
+    待機　3
+    イン　Keymoji0{{_keyケタ番号}}_基礎メモchild　150
+    .移動x2　Keymoji0{{_keyケタ番号}}_基礎メモchild　(-80 *(_向き)) 100
+    待機　100
+    入力禁止 false
+    
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+
+
+    画面領域開始　sc_南京錠UI　原点回帰時解除
+栞　南京錠正誤判定A
+{
+    
+    入力禁止 true
+    ~ タッチ素材設定　 UI/ui_Btn_miko01.png 　UI/ui_Btn_miko01.png　 UI/ui_Btn_miko02.png
+    ボタン0　story_Btn3_終端メモchild  -20 0 200　透明無視　スクリプト　game_gimmick.txt 南京錠正誤判定B
+    ボタン文字 story_Btn3_終端メモchild r-mplus-1c-m.ttf  80  0  15 "えりーとだもん"
+    ボタン文字 story_Btn3_終端メモchild r-mplus-1c-m.ttf  80  0  75 "だいじょうぶ！"
+    
+    .文字色  story_Btn3.* #FFFFFF
+     文字陰   story_Btn3.* 1  10   #fe4b74 0 0
+    拡大　story_Btn3.* 60%
+    
+    
+    透明度　story_Btn1.*　100 全画面領域
+    透明度 txtfuki_みこ_基礎メモchild　0 100
+    絵0 mikoPA_基礎メモchild　hito/35p_05.png  200 -200 72
+    拡大　mikoPA_基礎メモchild 30%
+    移動x2　mikoPA_基礎メモchild　-100 500
+    イン　mikoPA_基礎メモchild　500
+    
+    M_宣言文字窓その他吹き出し false "mikoP_基礎メモchild" "35P"　"void"　"#000000" 650 180 100 180
+    移動2　txtfuki_mikoP_基礎メモchild_skin　-20 -40
+    拡大　txtfuki_mikoP_基礎メモchild_skin　32% 45% 
+    文字サイズ  23
+    文字行サイズ  28
+    イン txtfuki_mikoP_基礎メモchild 300
+    "ほんとに大丈夫？？
+    ~
+    待機　500
+    
+    待機　3
+    アウト　story_Btn1.* 全画面領域
+    透明度　story_Btn3.*　100 全画面領域
+    イン　story_Btn3.*
+    //アウト mojimikoB_基礎メモchild 100
+    移動　story_Btn3_終端メモchild　280 50 500
+    待機　500
+    
+    入力禁止 false
+    
+    
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+
+//------------------------------------------------------
+//判定処理
+//------------------------------------------------------
+    画面領域終了　sc_南京錠UI　
+栞　南京錠正誤判定B
+{
+    
+    入力禁止 true
+    ////////
+   　//値作成と計算
+    変数　keyinput0 =  ( keyinput1_{{keyNowID}} * 1000 ) + ( keyinput2_{{keyNowID}} * 100 ) + ( keyinput3_{{keyNowID}} * 10 ) + ( keyinput4_{{keyNowID}} )
+　　　
+    
+    スクリプト　/Plugins/lvui/_system/events.txt 　func_ゼロ埋め　(keyinput0) 4
+    .変数　keyinput_moji = 返り値
+    変数消去　返り値
+    変数　a = (keypass_{{keyNowID}} == keyinput_moji)
+    変数　b = keypass_{{keyNowID}}
+    変数　c = keyinput_moji
+    
+    
+    もし　(keypass_{{keyNowID}} == keyinput_moji) スクリプト　game_gimmick.txt　南京錠正解
+    違ったら　スクリプト　game_gimmick.txt　南京錠不正解
+    
+    アウト flag_南京錠待機
+    入力禁止 false
+    //keypass_{{KeyNowID}}
+    
+    スクリプト終了
+    
+}
+
+待機 続行禁止
+
+    画面領域開始　sc_南京錠UI　原点回帰時解除
+    アウト　stage_end.* 全画面領域
+栞　南京錠不正解
+{
+    
+    
+    アウト　story_Btn.*　500
+    待機　500
+    .効果音　obj_SE　se_kei_keihou01.ogg
+    画像　mikoA_基礎メモchild　hito/miko_mini04.png
+    
+    文字0 keihoumoji_基礎メモchild 50 150 73  r-mplus-1c-m.ttf 35 50 "不正解！不正解！\n不審者を直ちに確保！"
+    文字陰  keihoumoji_基礎メモchild 1 6   #ff0000 0 0
+    使用文字窓　txtfuki_mikoP_基礎メモchild
+    "あー…\n言わんこっちゃない・・・
+    ~
+    イン keihoumoji_基礎メモchild 0
+    
+    
+     M_スクリ_クリック待機　false
+    
+    絵0　kintoki hito/kintoki_02.png 550 -80 78
+    拡大　kintoki 40%
+    イン　kintoki　500
+    移動x2　kintoki　-250 1000
+    
+    待機　1000
+    //みこセリフと表情設定
+    M_宣言文字窓その他吹き出し false "金時_基礎メモchild" "金時"　"void"　"#FF00FF" 800 350 100 180
+    拡大　txtfuki_金時_基礎メモchild_基礎　70%
+    
+    
+    移動2　txtfuki_金時_基礎メモchild_skin　-20 -40
+    拡大　txtfuki_金時_基礎メモchild_skin　32% 45% 
+   　移動2 txtfuki_金時_基礎メモchild_name 10 -10
+    文字サイズ  23
+    文字行サイズ  28
+    イン txtfuki_金時_基礎メモchild 300
+    
+    "捕まえた\ngameoverだよ…！
+    ~
+    待機　500
+    画面領域終了　sc_南京錠UI　
+    スクリプト　game_startsetup.txt　gameoverアニメ_金時
+    
+    
+     M_スクリ_クリック待機　false
+    スクリプト終了
+    
+}
+待機 続行禁止
+アウト　stage_end.* 全画面領域
+アウト　.*kintoki.* 全画面領域
+アウト　txtfuki_金時_基礎メモchild 全画面領域
+    画面領域開始　sc_南京錠UI　原点回帰時解除
+    
+栞　南京錠正解
+{
+    
+    アウト　story_Btn.*　500
+    待機　500
+    .効果音　obj_SE　se_kei_kagi02.ogg
+    画像　金時Nokey_基礎メモchild　komono/komono_Nokey02.png
+    画像　mikoA_基礎メモchild　hito/miko_mini01.png
+    待機　700
+    透明度　txtfuki_みこ_基礎メモchild　255 300
+    待機　300
+    
+    使用文字窓　txtfuki_みこ_基礎メモchild
+    "開いた！
+    .ふっふっふ\n朝飯前だにぇ！
+    ~
+    
+    待機　1000
+    使用文字窓　txtfuki_mikoP_基礎メモchild
+    "お見事\nこれはえりーと
+    ~
+    
+     M_スクリ_クリック待機　false
+    親子　back_基礎メモ　.*基礎メモchild
+    
+    アウト　flag_南京錠正解時削除.*　全画面領域
+    アウト flag_南京錠待機
+     
+    スクリプト終了
+    
+}
+    画面領域終了　sc_南京錠UI　
+
+
+待機 続行禁止
+    
+    画面領域開始　sc_南京錠UI　原点回帰時解除
+

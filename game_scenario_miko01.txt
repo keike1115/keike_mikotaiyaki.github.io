@@ -1,0 +1,420 @@
+栞　デバッグMaine
+{
+    
+//------------------------------------------------------
+//デバッグ用変数←最後には全て消すこと
+//------------------------------------------------------
+//ゲームモード設定
+臨時全域変数 gamemode  = "miko"
+//臨時全域変数 gamemode  = "suba"
+
+変数　D_now_stageNo  = 0 
+臨時全域変数 now_stageNo  = 0
+//------------------------------------------------------
+
+ジャンプ　game_startsetup.txt  nextscenario　1
+
+
+    
+}
+
+スクリプト終了
+待機 続行禁止
+
+~スクリプト /Plugins/lvui/_system/macros.txt
+.スクリプト　game_startsetup.txt　func_共通レイヤー設定
+    絵0 fukidasi UI/ui_fukidasi_{{ gamemode}}.png 950 130 81
+    絵0 selected_img item/itemui_selected_{{ gamemode}}.png 820 -149 82
+    拡大　selected_img,  fukidasi 　25%
+    .イン　 fukidasi 10
+    イン　selected_img
+    
+    背景 back_inventory Back/back_inventory.png 0 0 80
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+
+栞　gamescenario_miko_ヒントID定義
+{
+    
+    
+    //==============================
+    // ヒントフラグ初期化　ヒント番号 → タイトル名 対応表
+    //==============================
+    臨時全域変数 ヒント進行度数　= 6 //ゼロは含めない
+    臨時全域変数 ヒントID　= lvCreateVarList((ヒント進行度数+1))
+    臨時全域変数 ヒントID[0] = "初期通常"
+    臨時全域変数 ヒントID[1] = "カーテン"
+    臨時全域変数 ヒントID[2] = "牢屋トラップ"
+    臨時全域変数 ヒントID[3] = "スバル署長A"
+    臨時全域変数 ヒントID[4] = "未定"
+    臨時全域変数 ヒントID[5] = "未定"
+    臨時全域変数 ヒントID[6] = "未定"
+    
+    
+     スクリプト終了
+    
+}
+
+待機 続行禁止
+栞　gamescenario_miko_死因ID定義
+{
+    
+    
+    //==============================
+    // 死因ヒント番号 → タイトル名 対応表
+    //==============================
+    臨時全域変数 死因数　= 4 //ゼロは含めない
+    臨時全域変数 死因ID　= lvCreateVarList((死因数+1))
+    臨時全域変数 死因ID[0] = "VOID"
+    臨時全域変数 死因ID[1] = "カツアゲ"
+    臨時全域変数 死因ID[2] = "金時"
+    臨時全域変数　死因ID[3] = "逮捕"
+    臨時全域変数　死因ID[4] = "爆破"
+    
+    
+     スクリプト終了
+    
+}
+
+待機 続行禁止
+
+
+
+
+//---------------------------------------------------------------
+//mikoメイン　○○の手も借りたい
+//---------------------------------------------------------------
+栞　gamescenario_miko_Maine
+{
+    
+   
+    //スクリプト　現在　初期場面セット　"背景パス"　            "今"　"今の右のobj"　"今の左の"
+    スクリプト　game_startsetup.txt　初期場面セット　"back_horo_MDL"　"MDL"　"MIGI"　"VOID"
+    スクリプト　game_startsetup.txt　初期場面セット　"back_horo_MIGI"　"MIGI"　"VOID"　"MDL"
+    .待機　10
+    移動x　back_MDL　-1300
+    //移動x　back_MIGI　1300　
+    
+    //------------------------
+    //MDL
+    
+      絵0　trap_kintoki_MDL_child komono/kintoki_01.png  -40 -28 15
+    拡大 trap_kintoki_MDL_child　25%
+    
+    タッチ素材設定　komono/kagu_curtain01.png　komono/kagu_curtain01.png　komono/kagu_curtain01.png
+    ボタン0　curtain00_MDL_child  240 100 16 透明無視 スクリプト　game_scenario_miko{{now_stage数字}}.txt　miko_カーテン　0
+    タッチ開始時　curtain00_MDL_child　M_スクリ_クリック対象　"hatena"　"curtain00_MDL_child"
+ 　
+    ボタン0　curtain01_MDL_child   403 100 16 透明無視 スクリプト　game_scenario_miko{{now_stage数字}}.txt　miko_カーテン　1
+    タッチ開始時　curtain01_MDL_child　M_スクリ_クリック対象　"hatena"　"curtain01_MDL_child"
+    
+    ボタン0　curtain02_MDL_child   566 100 16 透明無視 スクリプト　game_scenario_miko{{now_stage数字}}.txt　miko_カーテン　2
+    タッチ開始時　curtain02_MDL_child　M_スクリ_クリック対象　"hatena"　"curtain02_MDL_child"
+    
+    ボタン0　curtain03_MDL_child   729 100 16 透明無視 スクリプト　game_scenario_miko{{now_stage数字}}.txt　miko_カーテン　3
+    タッチ開始時　curtain03_MDL_child　M_スクリ_クリック対象　"hatena"　"curtain03_MDL_child"
+    
+     //親子宣言はこまめに毎回しよう
+     .親子　back_MDL　.*MDL_child
+    .イン .*MDL_child
+    
+     //------------------------
+     
+    //MIGI
+    
+     絵　mikoP01_MIGI_child　 komono/35p_05.png　 70 80 16　
+   
+    タッチ素材設定　 komono/35p_05.png 　 komono/35p_05.png　 komono/35p_05.png
+    ボタン　mikoP_MIGI_child  70 80 17　透明無視　スクリプト　game_scenario_miko{{now_stage数字}}.txt　miko_mikoP
+    タッチ開始時　mikoP_MIGI_child　M_スクリ_クリック対象　"kaiwa"　"mikoP_MIGI_child"
+    拡大　mikoP.*　40%
+    
+     //親子宣言はこまめに毎回しよう
+     .親子　back_MIGI　.*MIGI_child
+    .イン .*MIGI_child
+    
+    
+   .スクリプト　/Plugins/lvui/_system/events.txt 　func_scene切替削除
+   
+    
+   ~ 入力禁止  false
+    
+    
+    待機　個体消滅　back_MDL
+    
+    
+     スクリプト終了
+    
+}
+
+待機 続行禁止
+
+
+//---------------------------------------------------------------
+//miko00 各イベントなど
+//---------------------------------------------------------------
+    //-----------------------------------------
+    //みぎ
+    //-----------------------------------------
+栞　miko_mikoP
+{
+    
+    アウト　fukidasi_target　50
+    画面領域開始　sc_story　原点回帰時解除
+    絵0 story_black_top　black_full_1280.png 0 -600 75 カメラ付着
+    絵0 story_black_bot　black_full_1280.png 0 600 75 カメラ付着
+    透明度　ui_Btn_.* 1 200 全画面領域
+    透明度　 black_.* 150 200
+    //立ち絵
+    M_宣言文字窓miko吹き出し "00"
+    
+    "・・・！35p！！ \w
+    .みこのたい焼き\nしらない？？\w
+    ~
+    //txtfukidasi_その他 _人obj _発言者　_表情パス　_色 _txtx _txty _txtr 拡大率　_回転角度
+    M_宣言文字窓その他吹き出し true "35P" "35P"　"void"　"#696969" 150 400 100 0　
+    "ごめん、知らん\w
+     ~
+    使用文字窓　txtfuki_miko
+    "(・・・うーむ) \w
+    ~ タッチ素材設定　 UI/ui_Btn_miko01.png 　UI/ui_Btn_miko01.png　 UI/ui_Btn_miko01.png
+    ボタン0　story_Btn0  0 0 200　透明無視　スクリプト　game_scenario_miko{{now_stage数字}}.txt　miko_mikoP_A
+    ボタン文字 story_Btn0 r-mplus-1c-m.ttf  50  0  50 "さがすの手伝って！"
+    
+    ボタン0　story_Btn1  300 0 200　透明無視　スクリプト　game_scenario_miko{{now_stage数字}}.txt　miko_mikoP_B
+    ボタン文字 story_Btn1 r-mplus-1c-m.ttf  50  0  20 "あやしい…"
+    ボタン文字 story_Btn1 r-mplus-1c-m.ttf  50  0  70 "トんでみな！"
+    
+    ボタン0　story_Btn2  600 0 200　透明無視　スクリプト　game_scenario_miko{{now_stage数字}}.txt　miko_mikoP_C
+    ボタン文字 story_Btn2 r-mplus-1c-m.ttf  50  0  20 "ありがと…"
+    ボタン文字 story_Btn2 r-mplus-1c-m.ttf  50  0  70 "ひとりで探すにぇ…！"
+    
+    拡大　story_Btn.*　75%
+    .文字色  story_Btn* #FFFFFF
+     文字陰   story_Btn.* 1  10   #fe4b74 0 0
+    .イン　story_Btn.*　300
+    待機　ボタン選択　story_Btn
+    
+   ~ アウト　story_Btn.* 50
+    
+    
+    
+    
+    待機　300
+   ~ アウト　 .*  500
+    透明度　ui_Btn_.* 255 500 全画面領域
+   ~待機　500
+   
+    画面領域終了　sc_story
+     スクリプト終了
+    
+}
+
+待機 続行禁止
+画面領域開始　sc_story　原点回帰時解除
+//選択肢別＝＝＝＝＝＝＝＝＝＝＝＝＝
+栞　miko_mikoP_A
+{
+    
+    アウト　story_Btn.*
+    .アウト mikoP_MIGI_child 50 全画面領域
+    使用文字窓　txtfuki_35P
+    "しょうがないなァ...\nついて行くよ\w
+    ~
+    
+    .アウト　.*　500
+    透明度　ui_Btn_.* 255 500 全画面領域
+   ~待機　500
+    画面領域終了　sc_story
+    スクリプト  game_item.txt  get_item_msg　"最小空箱"　"35P"　"35P"
+    タッチ素材設定　 item/item_robokohand.png  item/item_robokohand.png  item/item_robokohand.png  
+    ボタン0　roboko_MIGI_child  200 150 15　透明無視　スクリプト game_item.txt　アイテムボタン回収　"roboko_MIGI_child"　"最小空箱"　"robokohand"　"ロボ子ハンド"
+    タッチ開始時　roboko_MIGI_child　M_スクリ_クリック対象　"kagi"　"roboko_MIGI_child"
+    拡大　roboko_MIGI_child　30%
+    回転　roboko_MIGI_child 　50
+     .親子　back_MIGI　.*MIGI_child
+    .イン　roboko_MIGI_child
+    .アウト mikoP01_MIGI_child 50
+   //.画面領域開始　sc_story　原点回帰時解除
+    
+   
+   
+    
+     スクリプト終了原点回帰
+    
+}
+待機 続行禁止
+画面領域開始　sc_story　原点回帰時解除
+
+栞　miko_mikoP_B
+{
+    
+    
+   ~ アウト　story_Btn.* 50
+    
+    待機　300
+   ~ アウト　 .*  500
+    透明度　ui_Btn_.* 255 500 全画面領域
+   ~待機　500
+    画面領域終了　sc_story
+    .アウト　mikoP_MIGI_child　10
+    .アウト mikoP01_MIGI_child 　10
+    .ジャンプ　game_startsetup.txt　gameoverアニメ_35Pカツアゲ　300　80
+    
+     スクリプト終了
+    
+}
+待機 続行禁止
+
+栞　miko_mikoP_C
+{
+    
+    アウト　story_Btn.*
+    使用文字窓　txtfuki_35P
+    "おう、がんばってな\w
+    ~
+     スクリプト終了
+    
+}
+
+待機 続行禁止
+
+
+
+
+    //-----------------------------------------
+    //MDL
+    //-----------------------------------------
+ 栞　miko_カーテン　_obj
+ {
+     
+     //デバック
+     //変数　_obj　=　2
+     入力禁止 true
+     アウト　fukidasi_target　50
+     アウト　curtain0{{_obj}}_MDL_child
+     .絵0　taiyakiA_MDL_child　komono/taiyaki.png  150 -365 15
+       拡大　taiyakiA_MDL_child　10%  
+     .イン　taiyakiA_MDL_child
+     .絵　curtain0{{_obj}}_MDL_child　komono/kagu_curtain01.png　((_obj ) *163+240) 100 16     
+     .親子　back_MDL　.*MDL_child
+     焦点　curtain0{{_obj}}_MDL_child　0.0 0.5
+     .効果音　obj_SE　se_kei_curtain.ogg
+     .拡大x　curtain0{{_obj}}_MDL_child 20% 700
+     待機　 700
+     
+     
+    もし　( _obj == 0 ) ジャンプ　game_startsetup.txt　gameoverアニメ_金時
+    違ってももし　((_obj == 1) || (_obj == 3 ))    入力禁止  false
+    もし　((_obj == 1) || (_obj == 3 ))    スクリプト終了
+     
+     
+    .ボタン0　taiyakiB_MDL_child  komono/taiyaki.png  komono/taiyaki.png komono/taiyaki.png  150 -365 15　スクリプト　game_scenario_miko{{now_stage数字}}.txt　miko_たい焼きタッチ_TorF
+    タッチ開始時　taiyakiB_MDL_child　M_スクリ_クリック対象　"kagi"　"taiyakiB_MDL_child"
+    拡大　taiyakiB_MDL_child　10%  
+     .イン　taiyakiB_MDL_child　30
+     アウト　taiyakiA_MDL_child
+     .親子　back_MDL　.*MDL_child
+     
+     入力禁止  false
+     スクリプト終了
+    
+}
+
+待機 続行禁止
+
+栞　miko_たい焼きタッチ_TorF
+{
+    
+    
+     入力禁止 true
+     アウト　fukidasi_target　50
+    
+    もし　 ( selecting == "robokohand" )　ジャンプ　game_scenario_miko{{now_stage数字}}.txt　miko_たい焼きアニメA
+    違ってももし　 ( selecting == "35P" )　ジャンプ　game_startsetup.txt　gameoverアニメ_35Pカツアゲ　300　80
+    違ったら　スクリプト　game_scenario_miko{{now_stage数字}}.txt　miko_たい焼きアニメB
+    
+     入力禁止  false
+    
+     スクリプト終了
+    
+}
+
+待機 続行禁止
+
+
+栞　miko_たい焼きアニメA
+{
+     
+     
+   画面領域開始　sc_story　原点回帰時解除
+   
+    絵0 black_top black_full_1280.png 0 -650 75 カメラ付着
+    絵0 black_bot black_full_1280.png 0 650 75 カメラ付着
+    透明度　 black_.* 150 200
+     絵0　anime_miko hito/ANI_act_mikosenaka01.png  300 80 20
+     拡大　anime_miko　50%
+     絵　anime_item  item/item_robokohand.png 450 50 19
+     回転　anime_item　50
+     拡大　anime_item　50%
+    .イン　anime.*　500
+     待機　500
+     
+     移動y anime_item -40 300
+     待機　300
+     
+    M_宣言文字窓その他吹き出し true "みこ"　"void"　"#fe4b74" 300 400 100 0
+    "届いたにぇ！！\w
+    ~
+    待機　700
+    .アウト .*　100
+    アウト　taiyakiB_MDL_child　100　全画面領域
+    待機　100
+   画面領域終了　sc_story
+   スクリプト　game_item.txt　get_item_msg  5 "taiyaki"　"たい焼き"
+   
+   
+   
+     スクリプト終了
+    
+}
+
+待機 続行禁止
+アウト stage.* 全画面領域
+
+栞　miko_たい焼きアニメB
+{
+    
+    
+   画面領域開始　sc_story　原点回帰時解除
+    絵0 black_top black_full_1280.png 0 -650 75 カメラ付着
+    絵0 black_bot black_full_1280.png 0 650 75 カメラ付着
+    透明度　 black_.* 150 200
+     絵0　anime_miko hito/ANI_act_mikosenaka01.png  300 80 20
+     拡大　anime_miko　50%
+    .イン　anime_miko　500
+    待機　1000
+    
+    .移動y2　anime_miko　-100　250
+    待機　300
+    .移動y2　anime_miko　100　250
+    待機　700
+    .移動y2　anime_miko　-100　250
+    待機　300
+    .移動y2　anime_miko　100　250
+    待機　250
+    
+    M_宣言文字窓その他吹き出し true "みこ"　"void"　"#fe4b74" 300 400 100 0
+    "と、届かないにぇ・・・\w
+    ~
+    アウト　.* 200
+    待機　200
+    
+   画面領域終了　sc_story
+    
+    
+    
+     スクリプト終了
+    
+}
+
+待機　続行禁止
