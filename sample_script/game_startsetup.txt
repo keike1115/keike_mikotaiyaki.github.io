@@ -1,3 +1,16 @@
+/*
+ここでは各ステージであるgame_scenario_miko〇〇スクリプトを実行するときの前処理と後処理を担当しています。
+壱　何番目のステージを走らせるのか？タイトルや内部データは？それを表示する共通UIも
+弐　変数やフラグのの初期化、ステージごとの背景と場面転換移動
+参　ステージ終了後には・・・そのステージはクリアした？失敗？なのか。次のステージにチャレンジする？もう一度同じステージをする？
+
+などなど、ステージとステージを結ぶ大事な役割を持っています。その手の共通化できるコードはほぼここにひっくるめています
+
+
+
+*/
+
+
 栞　デバッグMaine
 {
     
@@ -157,47 +170,6 @@
 待機　続行禁止
 //---------------------------------------------------------------
 
-//スクリプト　game_startsetup.txt　マジック帽子シャッフル
-栞　マジック帽子シャッフルX値演算
-{
-    
-    
-        //スクリプト　test.txt   てすとC
-    
-
-    変数　values　 =  lvCreateVarList(3, lvCreateVarList(2))
-    変数　values[0][0] = 1
-    変数　values[0][1] = 2
-    変数　values[1][0] = 0
-    変数　values[1][1] = 2
-    変数　values[2][0] = 0
-    変数　values[2][1] = 1
-
-
-    // AとBを選んだので、それぞれのX座標を交換する
-
-    変数 A = lvRandom(0, 2)
-    変数 B = values[A][0]
-    変数 C = values[A][1]
-
-
-    変数 　TempX = PosList[B]
-    臨時全域変数　　PosList[B] = PosList[C]
-    臨時全域変数　　PosList[C] = TempX
-
-    // 文字　end_miko_moji01 120 200 151  r-mplus-1c-m.ttf 40 "{{PosList[0]}}"
-     //文字　end_miko_moji02 120 250 151  r-mplus-1c-m.ttf 40 "{{PosList[1]}}"
-     //文字　end_miko_moji03 120 300 151  r-mplus-1c-m.ttf 40 "{{PosList[2]}}"
-    // オブジェクトを新しいX座標に移動する
-
-
-    スクリプト終了
-    
-}
-
-
-
-
 
 //----------------------------------------------------
 
@@ -258,42 +230,7 @@
    全域変数　scenariotitle_miko2   =　"寝癖、大丈夫？？"
    全域変数　scenariotitle_miko3   =　"ウーバーござるにおまかせ！"
    全域変数　scenariotitle_miko4   =　"失礼しますマリン船長"
-   //
-   //"お帰り、伝説のドラゴン"
-   //"ぺこみこの絆"
-   //"アイテム錬成　こよりbox！"
-   //"愛を叫んで育てこのアホ毛！"
-   全域変数　scenariotitle_miko5   =　""
-   全域変数　scenariotitle_miko6   =　"ホロぐら「起こすな」"
-   全域変数　scenariotitle_miko7   =　"ちょっと一息、マリン船長"
-   全域変数　scenariotitle_miko8   =　"旧事務所版ホロハチ??"
-   全域変数　scenariotitle_miko9   =　"失礼しますノエル団長"
-   全域変数　scenariotitle_miko10   =　"み俺恥PONでみっく！"
-   全域変数　scenariotitle_miko11   =　"miko11"
-   全域変数　scenariotitle_miko12   =　"クイズ★ホロリーグ①"
-   全域変数　scenariotitle_miko13   =　"落ち葉がいっぱい"
-   全域変数　scenariotitle_miko14   =　"ホロぐら「電車ごっこ」"
-   全域変数　scenariotitle_miko15   =　"miko15"
-   全域変数　scenariotitle_miko16   =　"青くゆ★マジックショー"
-   全域変数　scenariotitle_miko17   =　"miko17"
-   全域変数　scenariotitle_miko18   =　"赤いなぁ…"
-   全域変数　scenariotitle_miko19   =　"miko19"
-   全域変数　scenariotitle_miko20   =　"ヒットマン「暁」"
-   全域変数　scenariotitle_miko21   =　"miko21"
-   全域変数　scenariotitle_miko22   =　"みんなで歌を歌おう！"
-   全域変数　scenariotitle_miko23   =　"miko23"
-   全域変数　scenariotitle_miko24   =　"miko24"
-   全域変数　scenariotitle_miko25   =　"miko25"
-   全域変数　scenariotitle_miko26   =　"miko26"
-   全域変数　scenariotitle_miko27   =　"27番下さいぺこ～"
-   全域変数　scenariotitle_miko28   =　"miko28"
-   全域変数　scenariotitle_miko29   =　"miko29"
-   全域変数　scenariotitle_miko30   =　"miko30"
-   全域変数　scenariotitle_miko31   =　"miko31"
-   全域変数　scenariotitle_miko32   =　"miko32"
-   全域変数　scenariotitle_miko33   =　"miko33"
-   全域変数　scenariotitle_miko34   =　"miko34"
-   全域変数　scenariotitle_miko35   =　"miko35"
+//以下中略
     全域変数保存
 //文字 gostage_name  500 10 100  r-mplus-1c-m.ttf 50 "{{clearedlevel_miko}}"
 スクリプト終了
@@ -301,50 +238,6 @@
 待機 続行禁止
 //----------------------------------------------------
 
-栞　func_シナリオタイトル_suba
-
-{
-
-   全域変数　scenariotitle_suba0  =　"すとーりー＆ちゅーとりある"
-   全域変数　scenariotitle_suba1  =　""
-   全域変数　scenariotitle_suba2   =　""
-   全域変数　scenariotitle_suba3   =　""
-   全域変数　scenariotitle_suba4   =　""
-   全域変数　scenariotitle_suba5   =　"鏡よ鏡"
-   全域変数　scenariotitle_suba6   =　"ほろぐら編その壱"
-   全域変数　scenariotitle_suba7   =　"人のふり見て我がふり正せ"
-   全域変数　scenariotitle_suba8   =　"八番出口に逃げ込んだアイツ"
-   全域変数　scenariotitle_suba9   =　"み俺恥ハザード"
-   全域変数　scenariotitle_suba10   =　"suba10"
-   全域変数　scenariotitle_suba11   =　"suba11"
-   全域変数　scenariotitle_suba12   =　"suba12"
-   全域変数　scenariotitle_suba13   =　"suba13"
-   全域変数　scenariotitle_suba14   =　"suba14"
-   全域変数　scenariotitle_suba15   =　"suba15"
-   全域変数　scenariotitle_suba16   =　"suba16"
-   全域変数　scenariotitle_suba17   =　"suba17"
-   全域変数　scenariotitle_suba18   =　"suba18"
-   全域変数　scenariotitle_suba19   =　"suba19"
-   全域変数　scenariotitle_suba20   =　"suba20"
-   全域変数　scenariotitle_suba21   =　"suba21"
-   全域変数　scenariotitle_suba22   =　"suba22"
-   全域変数　scenariotitle_suba23   =　"suba23"
-   全域変数　scenariotitle_suba24   =　"suba24"
-   全域変数　scenariotitle_suba25   =　"suba25"
-   全域変数　scenariotitle_suba26   =　"suba26"
-   全域変数　scenariotitle_suba27   =　"suba27"
-   全域変数　scenariotitle_suba28   =　"suba28"
-   全域変数　scenariotitle_suba29   =　"suba29"
-   全域変数　scenariotitle_suba30   =　"suba30"
-   全域変数　scenariotitle_suba31   =　"suba31"
-   全域変数　scenariotitle_suba32   =　"suba32"
-   全域変数　scenariotitle_suba33   =　"suba33"
-   全域変数　scenariotitle_suba34   =　"suba34"
-   全域変数　scenariotitle_suba35   =　"suba35"
-    
-    全域変数保存
-スクリプト終了
-}
 待機 続行禁止
 ~スクリプト /Plugins/lvui/_system/macros.txt
 .スクリプト　game_startsetup.txt　func_共通レイヤー設定
@@ -466,127 +359,7 @@
 
 待機 続行禁止
     
-
-//----------------------------------------------------
-//スクリプト　game_startsetup.txt　gameoverアニメ_35Pカツアゲ
-栞　gameoverアニメ_35Pカツアゲ　_X _Y
-{
-    
-    
-   画面領域開始　sc_story　原点回帰時解除
-    絵0 black_top black_full_1280.png 0 -650 75 カメラ付着
-    絵0 black_bot black_full_1280.png 0 650 75 カメラ付着
-    透明度　 black_.* 150 200
-   //  絵0　anime_mikoP komono/35p_05.png  300 80 20
-   //  絵0　anime_miko anime_action/ANI_act_mikosenaka01.png  150 150 20
-     絵0　anime_mikoP komono/35p_05.png ( _X) (_Y) 20
-     絵0　anime_miko hito/ANI_act_mikosenaka01.png (_X- 150) (_Y+70) 20
-     拡大　anime_miko.*　50%
-    .イン　anime_miko.*　500
-    待機　1000
-    
-     .ボイス　obj_SE　vo_miko_jump.ogg
-    .移動y2　anime_mikoP　-100　250
-    待機　300
-    .移動y2　anime_mikoP　100　250
-    待機　700
-    .移動y2　anime_mikoP　-100　250
-    待機　300
-    .移動y2　anime_mikoP　100　250
-    待機　250
-    
-     絵0　anime_saifu  item/item_saifu.png  250 250 21
-     //拡大　anime_saifu　50%
-     親子　anime_mikoP　anime_saifu
-     .イン　anime_saifu　50
-     待機　50
-     移動x2　anime_saifu　50 150
-     移動y2　anime_saifu　150 150 a5
-    待機　700
-    
-    
-   画面領域終了　sc_story
-   .スクリプト　game_item.txt　get_item_msg  5 "saifu"　"35pの財布"
-   待機　100
-  .画面領域開始　sc_story　原点回帰時解除
-    アウト　anime_saifu　10
-     絵　anime_suba  hito/ANI_act_suba01.png (_X-800) (_Y+70) 20
-     拡大　anime_suba　50%
-    移動x　anime_suba　-50　300
-    .ボイス　obj_VO　vo_suba_oozorakeisatu.ogg
-    
-   画面領域終了　sc_story
-   .ジャンプ　game_startsetup.txt　ステージ終了メイン　"gameover"　"04"　"カツアゲ罪"
-     スクリプト終了
-    
-}
-待機　続行禁止
-
-//----------------------------------------------------
-//スクリプト　game_startsetup.txt　gameoverアニメ_エロゲ誤爆
-栞　gameoverアニメ_エロゲ誤爆
-{
-    
-    
-    //エロゲ誤爆
-    
-    色調 storymiko_TV 0 0 0 0
-    
-    効果音　anime_SE　se_kei_rimokon.ogg
-    "アレ？？ \w
-    ~
-    
-    .効果音　anime_SE　se_kei_eroge01.ogg
-   画像　  storymiko_TV　story/storymiko_eroge01.png
-   待機　2000
-   
-    .効果音　anime_SE　se_kei_eroge02.ogg
-    
-   待機　2000
-    .効果音　anime_SE01　se_kei_eroge03.ogg
-    色調 storymiko_TV 255 255 255 0
-    待機　10000
-    
-    色調 storymiko_TV 0 0 0 0
-    
-    待機　1000
-    アウト　.* 　300
-    待機　300
-    画面領域終了　sc_story
-  スクリプト    game_startsetup.txt　ステージ終了メイン  "gameover"　"06"　"ギャルゲー誤爆"
-   
-     スクリプト終了
-    
-}
-待機　続行禁止
-
-//----------------------------------------------------
-//スクリプト　game_startsetup.txt　gameoverアニメ_逃走 _endtxt _エネミーobjpass　_エネミーx _エネミーy _エネミー拡大率
-    
-栞　gameoverアニメ_逃走 _endtxt _エネミーobjpass　_エネミーx _エネミーy _エネミー拡大率
-{
-    
-    
-  背景0　stage_end_img Back/back_gameover_miko_00.png 0 0 (vn_R値_ステ終了窓)
-  絵0　stage_end_miko hito/miko_mini20.png 100 50 (vn_R値_ステ終了窓 +1)
-  拡大　stage_end_miko　60%
-  //絵0　stage_end_エネミー hito/marin_kuma01.png 400 -50 91
-  //拡大　stage_end_エネミー　{{_エネミー拡大率}}
-  
-  絵0　stage_end_エネミー hito/{{_エネミーobjpass}}.png (_エネミーx) (_エネミーy) (vn_R値_ステ終了窓 +1)
-  拡大　stage_end_エネミー　{{_エネミー拡大率}}%
-  移動y2 stage_end_.* -600 0 
-  イン　stage_end_.*
-  スクリプト game_startsetup.txt　ステージ終了メイン  "gameover"　"00"　(_endtxt) "vo_miko_nige"
-   
-     スクリプト終了
-    
-}
-待機　続行禁止
-
-    
-    
-
+//以下ゲームオーバー演出たくさん中略
 //---------------------------------------------------------------
 //.ジャンプ　game_startsetup.txt　ステージ終了メイン　結果　imgNo　_endtxt
 栞　ステージ終了メイン　結果　imgNo　_endtxt _endvoicepass
