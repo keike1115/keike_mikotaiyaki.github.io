@@ -1,3 +1,15 @@
+/*
+ここではステージ１を設定しています。
+ネタバレ防止のためだいぶ中略しています。
+しかしながらgsample_scriptと併せて読むことで
+脱出ゲームにありがちな場面切り替えや初期宣言の仕組みをやんわりと知ることができます。
+場面ごとに背景を設定して親子宣言、追随する子objの設定、ボタンによる親とそれらの移動。。。といった感じです。
+
+*/
+
+
+
+
 栞　デバッグMaine
 {
     
@@ -31,52 +43,6 @@
     
     背景 back_inventory Back/back_inventory.png 0 0 80
 //----------------------------------------------------------------------------------------------------------------------------------------------------
-
-栞　gamescenario_miko_ヒントID定義
-{
-    
-    
-    //==============================
-    // ヒントフラグ初期化　ヒント番号 → タイトル名 対応表
-    //==============================
-    臨時全域変数 ヒント進行度数　= 6 //ゼロは含めない
-    臨時全域変数 ヒントID　= lvCreateVarList((ヒント進行度数+1))
-    臨時全域変数 ヒントID[0] = "初期通常"
-    臨時全域変数 ヒントID[1] = "カーテン"
-    臨時全域変数 ヒントID[2] = "牢屋トラップ"
-    臨時全域変数 ヒントID[3] = "スバル署長A"
-    臨時全域変数 ヒントID[4] = "未定"
-    臨時全域変数 ヒントID[5] = "未定"
-    臨時全域変数 ヒントID[6] = "未定"
-    
-    
-     スクリプト終了
-    
-}
-
-待機 続行禁止
-栞　gamescenario_miko_死因ID定義
-{
-    
-    
-    //==============================
-    // 死因ヒント番号 → タイトル名 対応表
-    //==============================
-    臨時全域変数 死因数　= 4 //ゼロは含めない
-    臨時全域変数 死因ID　= lvCreateVarList((死因数+1))
-    臨時全域変数 死因ID[0] = "VOID"
-    臨時全域変数 死因ID[1] = "カツアゲ"
-    臨時全域変数 死因ID[2] = "金時"
-    臨時全域変数　死因ID[3] = "逮捕"
-    臨時全域変数　死因ID[4] = "爆破"
-    
-    
-     スクリプト終了
-    
-}
-
-待機 続行禁止
-
 
 
 
@@ -215,27 +181,7 @@
 栞　miko_mikoP_A
 {
     
-    アウト　story_Btn.*
-    .アウト mikoP_MIGI_child 50 全画面領域
-    使用文字窓　txtfuki_35P
-    "しょうがないなァ...\nついて行くよ\w
-    ~
-    
-    .アウト　.*　500
-    透明度　ui_Btn_.* 255 500 全画面領域
-   ~待機　500
-    画面領域終了　sc_story
-    スクリプト  game_item.txt  get_item_msg　"最小空箱"　"35P"　"35P"
-    タッチ素材設定　 item/item_robokohand.png  item/item_robokohand.png  item/item_robokohand.png  
-    ボタン0　roboko_MIGI_child  200 150 15　透明無視　スクリプト game_item.txt　アイテムボタン回収　"roboko_MIGI_child"　"最小空箱"　"robokohand"　"ロボ子ハンド"
-    タッチ開始時　roboko_MIGI_child　M_スクリ_クリック対象　"kagi"　"roboko_MIGI_child"
-    拡大　roboko_MIGI_child　30%
-    回転　roboko_MIGI_child 　50
-     .親子　back_MIGI　.*MIGI_child
-    .イン　roboko_MIGI_child
-    .アウト mikoP01_MIGI_child 50
-   //.画面領域開始　sc_story　原点回帰時解除
-    
+    //中略
    
    
     
@@ -345,33 +291,7 @@
 栞　miko_たい焼きアニメA
 {
      
-     
-   画面領域開始　sc_story　原点回帰時解除
-   
-    絵0 black_top black_full_1280.png 0 -650 75 カメラ付着
-    絵0 black_bot black_full_1280.png 0 650 75 カメラ付着
-    透明度　 black_.* 150 200
-     絵0　anime_miko hito/ANI_act_mikosenaka01.png  300 80 20
-     拡大　anime_miko　50%
-     絵　anime_item  item/item_robokohand.png 450 50 19
-     回転　anime_item　50
-     拡大　anime_item　50%
-    .イン　anime.*　500
-     待機　500
-     
-     移動y anime_item -40 300
-     待機　300
-     
-    M_宣言文字窓その他吹き出し true "みこ"　"void"　"#fe4b74" 300 400 100 0
-    "届いたにぇ！！\w
-    ~
-    待機　700
-    .アウト .*　100
-    アウト　taiyakiB_MDL_child　100　全画面領域
-    待機　100
-   画面領域終了　sc_story
-   スクリプト　game_item.txt　get_item_msg  5 "taiyaki"　"たい焼き"
-   
+    //中略
    
    
      スクリプト終了
@@ -383,35 +303,7 @@
 
 栞　miko_たい焼きアニメB
 {
-    
-    
-   画面領域開始　sc_story　原点回帰時解除
-    絵0 black_top black_full_1280.png 0 -650 75 カメラ付着
-    絵0 black_bot black_full_1280.png 0 650 75 カメラ付着
-    透明度　 black_.* 150 200
-     絵0　anime_miko hito/ANI_act_mikosenaka01.png  300 80 20
-     拡大　anime_miko　50%
-    .イン　anime_miko　500
-    待機　1000
-    
-    .移動y2　anime_miko　-100　250
-    待機　300
-    .移動y2　anime_miko　100　250
-    待機　700
-    .移動y2　anime_miko　-100　250
-    待機　300
-    .移動y2　anime_miko　100　250
-    待機　250
-    
-    M_宣言文字窓その他吹き出し true "みこ"　"void"　"#fe4b74" 300 400 100 0
-    "と、届かないにぇ・・・\w
-    ~
-    アウト　.* 200
-    待機　200
-    
-   画面領域終了　sc_story
-    
-    
+    //中略
     
      スクリプト終了
     
