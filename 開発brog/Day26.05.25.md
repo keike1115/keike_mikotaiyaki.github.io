@@ -21,7 +21,7 @@ light.vn　ver17では主に画面領域に関する更新が行われました�
 
 専門用語がでてきましたね。ここでいったん解説を挟みたいと思います。
 皆さんはゲームをするうえで、メニュー画面を開いたり、あるいはストーリー演出のためにそれ専用のUIが出てくる経験があったと思います。
-<br>・・・さすがにありますよね？？？(汗)
+<br>・・・さすがにありますよね？？？(汗)<br>
 <img src="https://raw.githubusercontent.com/keike1115/keike_mikotaiyaki.github.io/main/images/demo_004.png" width="400"><br>
 ここで、それらの演出中にいままでの画像UIやボタンUIが残っていたり、誤って反応してしまったら画面がぐちゃぐちゃになります。
 そこで登場するのが画面領域です
@@ -64,16 +64,7 @@ M_宣言文字窓その他吹き出し true "みこ" "みこ"　"void"　"#fe4b7
 
 たとえばこんな流れ。
 
-```{=html}
-<details>
-```
-```{=html}
-<summary>
-```
 コード例：理想の流れ
-```{=html}
-</summary>
-```
 ``` lightvn
 みこ「君にアイテムをあげるにぇ！」
 ↓
@@ -82,19 +73,13 @@ M_宣言文字窓その他吹き出し true "みこ" "みこ"　"void"　"#fe4b7
 会話続行
 ```
 
-```{=html}
-</details>
-```
 一見、簡単そうに見えます。
 
 しかしここで **画面領域** が絡むと話が変わりました。
 
-------------------------------------------------------------------------
-
-# 2. 問題：アイテムUIは基底領域で動いていた
-
-自作の `get_item_msg` は、もともと **基底領域でUIを生成する**
+自作の `get_item_msg` は、もともと **呼び出すたびにその画面領域でUIを生成する**
 設計でした。
+手持ちのアイテムがゼロになればアイテム画像UIも消去されます
 
 普段はこれで問題ありません。
 
@@ -115,16 +100,6 @@ M_宣言文字窓その他吹き出し true "みこ" "みこ"　"void"　"#fe4b7
 
 ここでそのまま `get_item_msg` を呼ぶと......
 
-```{=html}
-<details>
-```
-```{=html}
-<summary>
-```
-コード例：問題発生
-```{=html}
-</summary>
-```
 ``` lightvn
 画面領域開始 sc_story
 
@@ -132,13 +107,15 @@ M_宣言文字窓その他吹き出し ...
 "君にアイテムをあげるにぇ！！"
 
 スクリプト game_item.txt get_item_msg
+//ここでストーリー演出上の画面領域でアイテムUIが更新、再生成されてしまう
 アウト .*
+//アイテムが巻き添えで消える
 ```
 
 ```{=html}
 </details>
 ```
-後続の `アウト` が期待通り動かず、特にインベントリUIが巻き込まれました。
+後続の `アウト` が期待通り動かず、特にアイテムインベントリUIが巻き込まれました。
 
 つまり、
 
@@ -156,30 +133,16 @@ M_宣言文字窓その他吹き出し ...
 
 です。
 
-```{=html}
-<details>
-```
-```{=html}
-<summary>
-```
 コード例：最初の回避策
-```{=html}
-</summary>
-```
 ``` lightvn
 画面領域終了 sc_story
 スクリプト game_item.txt get_item_msg
 画面領域開始 sc_story 原点回帰時解除
 ```
 
-```{=html}
-</details>
-```
 これで確かに動きました。
 
-一件落着......
-
-......と思っていました。
+一件落着......だと思っていたのですが…
 
 ------------------------------------------------------------------------
 
@@ -189,16 +152,6 @@ M_宣言文字窓その他吹き出し ...
 
 上位スクリプト：
 
-```{=html}
-<details>
-```
-```{=html}
-<summary>
-```
-コード例：上位側
-```{=html}
-</summary>
-```
 ``` lightvn
 画面領域開始 sc_story
 
@@ -208,33 +161,45 @@ M_宣言文字窓その他吹き出し ...
 画面領域終了 sc_story
 ```
 
-```{=html}
-</details>
-```
 ルートB：
 
-```{=html}
-<details>
-```
-```{=html}
-<summary>
-```
 コード例：下位側
-```{=html}
-</summary>
-```
 ``` lightvn
-画面領域終了 sc_story
-get_item_msg
-画面領域開始 sc_story
-```
+栞　ルートA
+{
+    
+    //ストーリー演出中にアイテムを渡したいときはあるよね・・・
+    M_宣言文字窓その他吹き出し true "みこ" "みこ"　"void"　"#fe4b74" 100 200 100 90
+    "アイテムまだ上げないにぇ　出直して。\w
+    ~
+    スクリプト終了
+    
+}
 
-```{=html}
-</details>
+待機 続行禁止
+栞　ルートB
+{
+    
+    
+    M_宣言文字窓その他吹き出し true "みこ" "みこ"　"void"　"#fe4b74" 100 200 100 90
+    "君にアイテムをあげるにぇ！！\w
+    ~
+    画面領域終了　sc_story　
+    //OK　下位スクリプト先で終了は許される
+    スクリプト　game_item.txt　get_item_msg  "最小空箱" "maguma"　"まぐま"  
+    画面領域開始　sc_story　原点回帰時解除
+    //まぁOK
+      
+    //エラー！　画面領域終了を上位スクリプトに投げることはできない。ここで 画面領域終了　sc_story　が必要だが・・・仕様と衝突する
+    スクリプト終了
+    
+}
+
+待機 続行禁止
 ```
-ここで新たな問題が発覚。
 
 **領域の開始・終了責任が上下スクリプトで分裂した** のです。
+上記にもありますが、画面領域終了を上位スクリプトに投げることはできないという問題が発覚しました
 
 結果、
 
@@ -266,10 +231,10 @@ get_item_msg
 -   修正範囲増加
 
 という問題もありました。
+またこれには現在の画面領域がどの位置にいるのか？ということをif文で判定する必要が有るのですが、
+その状態を検知する関数はlight.vnにはありません。
 
-悪くない。
-
-でも、なんか違う。
+さて困った
 
 ------------------------------------------------------------------------
 
@@ -289,9 +254,6 @@ get_item_msg
 
 という発想です。
 
-------------------------------------------------------------------------
-
-# 7. 最終解：基底常駐＋透明度管理
 
 最終的に採用したのは、
 
@@ -301,6 +263,105 @@ get_item_msg
 
 への統一でした。
 
+旧スクリプト
+```
+//---------------------------------------------------------------
+////内部処理(メッセージ挟まず直接与える時はこちら)(初期装備など)
+//---------------------------------------------------------------
+    
+栞　get_item　_inventoryNo　_itempass　_itemname
+{
+    
+   
+   //個数チェックとその更新
+   //もし ( inventoryname[{{_inventoryNo}}]  == _itemname) スクリプト　game_item.txt　アイテム個数プラス
+   //違ったら　スクリプト　game_item.txt　アイテム個数壱
+   もし ( inventoryname[{{_inventoryNo}}]  == _itemname) 臨時全域変数　inventoryQTE[{{_inventoryNo}}]　+= 1
+   違ったら　臨時全域変数　inventoryQTE[{{_inventoryNo}}]　= 1
+   
+    
+    臨時全域変数　inventorypass[{{_inventoryNo}}]　= _itempass
+    臨時全域変数　inventoryname[{{_inventoryNo}}]  = _itemname
+    
+    変数　tempQTE = inventoryQTE[{{_inventoryNo}}]
+    //毎回ボタンを定義していた
+    タッチ素材設定　item/item_{{_itempass}}.png  item/item_{{_itempass}}.png  item/item_{{_itempass}}.png  
+    ボタン0 Btn_inventory{{_inventoryNo}} (130 * (_inventoryNo%2)  + 820 )   ((_inventoryNo/2)*133 -150) (vn_R値_インベントリ +1) スクリプト　game_item.txt　アイテム持ち替えSorF　{{_inventoryNo}}
+    タッチ開始時　Btn_inventory{{_inventoryNo}}　スクリプト　game_item.txt　アイテム名表示　　{{_inventoryNo}}
+    拡大　Btn_inventory{{_inventoryNo}}　25%
+    .イン　 Btn_inventory{{_inventoryNo}} 300
+    文字0 mojiQTE_inventory{{_inventoryNo}} (140 * (_inventoryNo%2)  + 1090 )   (133*(_inventoryNo/2)+160)  (vn_R値_インベントリ +20)  r-mplus-1c-m.ttf 40 "×{{tempQTE}} "
+   もし ( tempQTE >= 2)  イン mojiQTE_inventory{{_inventoryNo}} 10
+   違ったら　透明度　mojiQTE_inventory{{_inventoryNo}}　0 10
+
+}
+
+スクリプト終了
+待機 続行禁止
+
+```
+
+新スクリプト
+```
+//ボタンの配置をします
+栞　アイテム初期UI配置　_inventoryNo　
+{
+    
+    
+    変数 _itempass　=　inventorypass[{{_inventoryNo}}]
+    変数　tempQTE = inventoryQTE[{{_inventoryNo}}]
+    
+    
+    タッチ素材設定　item/item_undefined.png　item/item_undefined.png　item/item_undefined.png
+    ボタン0 Btn_inventory{{_inventoryNo}} (130 * (_inventoryNo%2)  + 820 )   ((_inventoryNo/2)*133 -150) (vn_R値_インベントリ +1) スクリプト　game_item.txt　アイテム持ち替えSorF　{{_inventoryNo}}
+    タッチ開始時　Btn_inventory{{_inventoryNo}}　スクリプト　game_item.txt　アイテム名表示　　{{_inventoryNo}}
+    反応透明度　Btn_inventory{{_inventoryNo}}　250
+    拡大　Btn_inventory{{_inventoryNo}}　25%
+    
+    変数　mojiObj = "QTE_inv{{_inventoryNo}}"
+    M_宣言領域耐性文字 (mojiObj)　(140 * (_inventoryNo%2)  + 1080 )   (133*(_inventoryNo/2)+140)  (vn_R値_インベントリ +20) 40
+    "×{{tempQTE}}
+    ~
+    //イン　sc耐性文字_QTE_inv{{_inventoryNo}}//
+    
+    
+    スクリプト終了
+    
+}
+```
+```
+栞　get_item　_inventoryNo　_itempass　_itemname
+{
+    
+   
+   //個数チェックとその更新
+   //もし ( inventoryname[{{_inventoryNo}}]  == _itemname) スクリプト　game_item.txt　アイテム個数プラス
+   //違ったら　スクリプト　game_item.txt　アイテム個数壱
+   もし ( inventoryname[{{_inventoryNo}}]  == _itemname) 臨時全域変数　inventoryQTE[{{_inventoryNo}}]　+= 1
+   違ったら　臨時全域変数　inventoryQTE[{{_inventoryNo}}]　= 1
+   
+    
+    臨時全域変数　inventorypass[{{_inventoryNo}}]　= _itempass
+    臨時全域変数　inventoryname[{{_inventoryNo}}]  = _itemname
+    
+    変数　tempQTE = inventoryQTE[{{_inventoryNo}}]
+    
+    透明度　 Btn_inventory{{_inventoryNo}}　0　全画面領域
+    画像　Btn_inventory{{_inventoryNo}}　item/item_{{_itempass}}.png　全画面領域
+    
+    .イン　 Btn_inventory{{_inventoryNo}} 300　全画面領域
+    使用文字窓 sc耐性文字_QTE_inv{{_inventoryNo}}
+    "×{{tempQTE}}
+    ~
+    もし ( tempQTE >= 2)  イン sc耐性文字_QTE_inv{{_inventoryNo}} 10　全画面領域
+    違ったら　透明度 sc耐性文字_QTE_inv{{_inventoryNo}}　0 10　全画面領域
+
+}
+
+スクリプト終了
+待機 続行禁止
+
+```
 つまり、
 
 > 画面領域は演出管理だけ
@@ -311,16 +372,7 @@ get_item_msg
 
 これにより：
 
-```{=html}
-<details>
-```
-```{=html}
-<summary>
-```
 コード例：どこからでも呼べる
-```{=html}
-</summary>
-```
 ``` lightvn
 画面領域開始 sc_story
 スクリプト game_item.txt get_item_msg
@@ -332,45 +384,35 @@ get_item_msg
 スクリプト game_item.txt get_item_msg
 ```
 
-```{=html}
-</details>
-```
 すべて正常動作。
 
 もう、
 
-``` lightvn
 終了 → 処理 → 再開始
-```
-
-も、
-
-``` lightvn
 現在領域判定
-```
 
-も不要です。
+どちらも不要です。
 
 ------------------------------------------------------------------------
 
-# 8. 学び
+# 8. 結び
 
-今回の件で面白かったのは、
+今回の件で面白かったのは、最初は「バグ修正」だったのに、最終的には
+ UI責務の再設計になっていたことです。
 
-最初は「バグ修正」だったのに、
+大きな手術と発想の転換が必要でしたが、それでも便利な機能同士ほど、責務分離は大事。
+毎回objは消せばいいってもんじゃないんですねぇ～
 
-最終的には
+さて、、今回はここまで。
+次回はいよいよこよＢｏｘの完成を目指します。
+これで心置きなくストーリー演出中にアイテムを渡せるぞぉ！！
+あ、ついでに今までにも使っていた
 
-> UI責務の再設計
+``` lightvn
+画面領域終了 sc_story
+スクリプト game_item.txt get_item_msg
+画面領域開始 sc_story 原点回帰時解除
+```
+部分の修正も忘れずにね！！
 
-になっていたことです。
-
-便利な機能同士ほど、責務分離は大事。
-
-そして時には、
-
-**「特殊ケース対応を増やす」より、責任の置き場所そのものを変える**
-
-ほうがシンプルに解決する。
-
-そんな開発旅でした。
+それではまた次回お会いしいましょう！
